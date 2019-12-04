@@ -158,8 +158,32 @@ ALTER TABLE medical_plan_ded_integrated
 
 CREATE TABLE dental_plans
 (
+    plan_id     CHAR(17) REFERENCES plans (plan_id),
+    metal_level INT,
+    PRIMARY KEY (plan_id)
+);
+
+CREATE TABLE dental_plan_moop
+(
     plan_id                        CHAR(17) REFERENCES plans (plan_id),
-    metal_level                    INT,
+    inn_tier1_individual           INT,
+    inn_tier1_family_per_person    INT,
+    inn_tier1_family_per_group     INT,
+    inn_tier2_individual           INT,
+    inn_tier2_family_per_person    INT,
+    inn_tier2_family_per_group     INT,
+    oon_individual                 INT,
+    oon_family_per_person          INT,
+    oon_family_per_group           INT,
+    comb_inn_oon_individual        INT,
+    comb_inn_oon_family_per_person INT,
+    comb_inn_oon_family_per_group  INT,
+    PRIMARY KEY (plan_id)
+);
+
+CREATE TABLE dental_plan_ded
+(
+    plan_id                        CHAR(17) REFERENCES plans (plan_id),
     inn_tier1_individual           INT,
     inn_tier1_family_per_person    INT,
     inn_tier1_family_per_group     INT,
@@ -182,7 +206,7 @@ ALTER TABLE dental_plans
 
 CREATE TABLE benefits
 (
-    id   INT,
+    id   INT PRIMARY KEY,
     name VARCHAR(31)
 );
 
@@ -207,7 +231,9 @@ CREATE TABLE plan_benefit
     coins_oon_type        INT,
     is_ehb                BOOLEAN,
     is_excl_from_inn_mood BOOLEAN,
-    is_excl_from_oon_mood BOOLEAN
+    is_excl_from_oon_mood BOOLEAN,
+    PRIMARY KEY (plan_id, benefit_id),
+    FOREIGN KEY (benefit_id) REFERENCES benefits (id)
 );
 
 ALTER TABLE plan_benefit
@@ -220,7 +246,9 @@ CREATE TABLE plan_benefit_limitation
     limit_qty   INT,
     limit_unit  INT,
     exclusions  VARCHAR(255),
-    explanation VARCHAR(255)
+    explanation VARCHAR(255),
+    PRIMARY KEY (plan_id, benefit_id),
+    FOREIGN KEY (plan_id, benefit_id) REFERENCES plan_benefit (plan_id, benefit_id)
 );
 
 ALTER TABLE plan_benefit_limitation
@@ -233,13 +261,13 @@ CREATE TABLE rate_individual
 (
     effective_date          DATE,
     expiration_date         DATE,
-    plan_id                 CHAR(14),
+    std_component_id        CHAR(14),
     rating_area_id          INT,
     tobacco                 INT,
     age                     INT,
     individual_rate         NUMERIC(6, 2),
     individual_tobacco_rate NUMERIC(6, 2),
-    primary key (effective_date, expiration_date, plan_id, rating_area_id, age)
+    PRIMARY KEY (effective_date, expiration_date, std_component_id, rating_area_id, age)
 );
 
 ALTER TABLE rate_individual
@@ -247,19 +275,14 @@ ALTER TABLE rate_individual
 
 CREATE TABLE rate_family
 (
-    effective_date                       DATE,
-    expiration_date                      DATE,
-    plan_id                              CHAR(14),
-    rating_area_id                       INT,
-    individual                           NUMERIC(6, 2),
-    couple                               NUMERIC(6, 2),
-    primary_and_one_dependent            NUMERIC(6, 2),
-    primary_and_two_dependents           NUMERIC(6, 2),
-    primart_and_three_or_more_dependents NUMERIC(6, 2),
-    couple_and_one_dependent             NUMERIC(6, 2),
-    couple_and_two_dependent             NUMERIC(6, 2),
-    couple_and_three_or_more_dependents  NUMERIC(6, 2),
-    primary key (effective_date, expiration_date, plan_id, rating_area_id)
+    effective_date   DATE,
+    expiration_date  DATE,
+    std_component_id CHAR(14),
+    rating_area_id   INT,
+    individual       NUMERIC(6, 2),
+    family_type      INT,
+    family_rate      NUMERIC(6, 2),
+    PRIMARY KEY (effective_date, expiration_date, std_component_id, rating_area_id)
 );
 
 ALTER TABLE rate_family

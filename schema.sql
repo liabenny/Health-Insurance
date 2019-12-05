@@ -75,11 +75,11 @@ ALTER TABLE dental_plans
 
 CREATE TABLE dental_plan_moop_ded
 (
-    plan_id           CHAR(17) REFERENCES plans (plan_id),
-    moop_or_ded       INT, -- MOOP, DEDUCTIBLE
-    network_type      INT, -- INN_TIER1, INN_TIER2, OON, COMB_INN_OON
-    object_type       INT, -- INDIVIDUAL, FAMILY_PER_PERSON, FAMILY_PER_GROUP
-    amount            INT
+    plan_id      CHAR(17) REFERENCES plans (plan_id),
+    moop_or_ded  INT, -- MOOP, DEDUCTIBLE
+    network_type INT, -- INN_TIER1, INN_TIER2, OON, COMB_INN_OON
+    object_type  INT, -- INDIVIDUAL, FAMILY_PER_PERSON, FAMILY_PER_GROUP
+    amount       INT
 );
 
 ALTER TABLE dental_plan_moop_ded
@@ -116,7 +116,8 @@ CREATE TABLE plan_benefit
     is_excl_from_inn_moop BOOLEAN,
     is_excl_from_oon_moop BOOLEAN,
     PRIMARY KEY (plan_id, benefit_id),
-    FOREIGN KEY (benefit_id) REFERENCES benefits (id)
+    FOREIGN KEY (benefit_id) REFERENCES benefits (id),
+    FOREIGN KEY (plan_id) REFERENCES plans (plan_id)
 );
 
 ALTER TABLE plan_benefit

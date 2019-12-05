@@ -142,6 +142,48 @@ CREATE TABLE coin_type
     primary key (id)
 );
 
+-- Hours per week
+-- Hours per month
+-- Hours per year
+-- Days per week
+-- Days per month
+-- Days per year
+-- Months per year
+-- Visits per week
+-- Visits per month
+-- Visits per year
+-- Lifetime visits
+-- Treatments per week
+-- Treatments per month
+-- Lifetime treatments
+-- Lifetime admissions
+-- Procedures per week
+-- Procedures per month
+-- Procedures per year
+-- Lifetime procedures
+-- Dollars per year
+-- Dollars per visit
+-- Days per admission
+-- Procedures per episode
+CREATE TABLE limit_unit_type(
+    id INT,
+    type_name VARCHAR(31),
+    primary key (id)
+);
+
+-- Design Type 1
+-- Design Type 2
+-- Design Type 3
+-- Design Type 4
+-- Design Type 5
+-- Not Applicable
+CREATE TABLE design_type (
+    id INT,
+    type_name VARCHAR(15),
+    primary key (id)
+);
+
+
 INSERT INTO market_coverage_type
 VALUES (1, 'Individual');
 INSERT INTO market_coverage_type
@@ -348,4 +390,63 @@ INSERT INTO coin_type
 VALUES (4, '% Coinsurance after deductible');
 INSERT INTO coin_type
 VALUES (5, 'Not Applicable');
-
+INSERT INTO limit_unit_type
+VALUES (1, 'Hours per week');
+INSERT INTO limit_unit_type
+VALUES (2, 'Hours per month');
+INSERT INTO limit_unit_type
+VALUES (3, 'Hours per year');
+INSERT INTO limit_unit_type
+VALUES (4, 'Days per week');
+INSERT INTO limit_unit_type
+VALUES (5, 'Days per month');
+INSERT INTO limit_unit_type
+VALUES (6, 'Days per year');
+INSERT INTO limit_unit_type
+VALUES (7, 'Months per year');
+INSERT INTO limit_unit_type
+VALUES (8, 'Months per year');
+INSERT INTO limit_unit_type
+VALUES (9, 'Visits per week');
+INSERT INTO limit_unit_type
+VALUES (10, 'Visits per month');
+INSERT INTO limit_unit_type
+VALUES (11, 'Visits per year');
+INSERT INTO limit_unit_type
+VALUES (12, 'Lifetime visits');
+INSERT INTO limit_unit_type
+VALUES (13, 'Treatments per week');
+INSERT INTO limit_unit_type
+VALUES (14, 'Treatments per month');
+INSERT INTO limit_unit_type
+VALUES (15, 'Lifetime treatments');
+INSERT INTO limit_unit_type
+VALUES (16, 'Lifetime admissions');
+INSERT INTO limit_unit_type
+VALUES (17, 'Procedures per week');
+INSERT INTO limit_unit_type
+VALUES (18, 'Procedures per month');
+INSERT INTO limit_unit_type
+VALUES (19, 'Procedures per year');
+INSERT INTO limit_unit_type
+VALUES (20, 'Lifetime procedures');
+INSERT INTO limit_unit_type
+VALUES (21, 'Dollars per year');
+INSERT INTO limit_unit_type
+VALUES (22, 'Dollars per visit');
+INSERT INTO limit_unit_type
+VALUES (23, 'Days per admission');
+INSERT INTO limit_unit_type
+VALUES (24, 'Procedures per episode');
+INSERT INTO design_type
+VALUES (1, 'Design Type 1');
+INSERT INTO design_type
+VALUES (2, 'Design Type 2');
+INSERT INTO design_type
+VALUES (3, 'Design Type 3');
+INSERT INTO design_type
+VALUES (4, 'Design Type 4');
+INSERT INTO design_type
+VALUES (5, 'Design Type 5');
+INSERT INTO design_type
+VALUES (6, 'Not Applicable');

@@ -39,7 +39,7 @@ ALTER TABLE plan_type
 CREATE TABLE qhp_type
 (
     id        INT,
-    type_name VARCHAR(15),
+    type_name VARCHAR(31),
     primary key (id)
 );
 
@@ -253,7 +253,7 @@ CREATE TABLE plans
     state                                CHAR(2),
     source_name                          INT REFERENCES source_name_type (id),
     import_date                          TIMESTAMP,
-    hios_product_id                      CHAR(7),
+    hios_product_id                      CHAR(10),
     hpid                                 CHAR(10),
     network_id                           CHAR(6),
     service_area_id                      CHAR(6),
@@ -271,6 +271,10 @@ CREATE TABLE plans
     out_of_service_area_coverage_desc    VARCHAR(255),
     plan_level_exclusions                VARCHAR(255),
     est_advanced_payment_for_indian_plan DECIMAL(5, 2),
+    csr_variant_type                     INT,
+    multiple_in_network_tiers            BOOLEAN,
+    first_tier_utilization               INT,
+    second_tier_utilization              INT,
     effective_date                       DATE,
     expiration_date                      DATE,
     PRIMARY KEY (plan_id)
@@ -310,6 +314,27 @@ CREATE TABLE medical_plan_disease
 );
 
 ALTER TABLE medical_plan_disease
+    OWNER TO manager;
+
+CREATE TABLE medical_plan_sbc
+(
+    plan_id                            CHAR(17) REFERENCES plans (plan_id),
+    having_baby_deductible             INT,
+    having_baby_copayment              INT,
+    having_baby_coinsurance            INT,
+    having_baby_limit                  INT,
+    having_diabetes_deductible         INT,
+    having_diabetes_copayment          INT,
+    having_diabetes_coinsurance        INT,
+    having_diabetes_limit              INT,
+    having_simple_fracture_deductible  INT,
+    having_simple_fracture_copayment   INT,
+    having_simple_fracture_coinsurance INT,
+    having_simple_fracture_limit       INT,
+    PRIMARY KEY (plan_id)
+);
+
+ALTER TABLE medical_plan_sbc
     OWNER TO manager;
 
 CREATE TABLE medical_plan_moop
@@ -578,9 +603,9 @@ VALUES (4, 'POS');
 INSERT INTO plan_type
 VALUES (5, 'EPO');
 INSERT INTO qhp_type
-VALUES (1, 'On Exchange');
+VALUES (1, 'On the Exchange');
 INSERT INTO qhp_type
-VALUES (2, 'Off Exchange');
+VALUES (2, 'Off the Exchange');
 INSERT INTO qhp_type
 VALUES (3, 'Both');
 INSERT INTO child_only_offering_type

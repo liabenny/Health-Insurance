@@ -10,11 +10,8 @@ family_layout = [sg.Text('Family Type', font='Any 12'),
                  sg.Combo(('Couple', 'PrimarySubscriberAndOneDependent', 'PrimarySubscriberAndTwoDependents',
                            'PrimarySubscriberAndThreeOrMoreDependents',
                            'CoupleAndOneDependent', 'CoupleAndTwoDependents', 'CoupleAndThreeOrMoreDependents'),
-                          enable_events=True, key='Family Type', font='Any 12',
+                          enable_events=True, key='Family_Type', font='Any 12',
                           size=(28, 7))],
-
-# TODO: Medical only
-medical_layout = []
 
 # Layout Design
 # sg.change_look_and_feel('DarkAmber')  # Add a touch of color
@@ -44,10 +41,12 @@ layout = [[sg.Menu(menu_def, tearoff=True)],
            sg.Radio('Family', 'Radio2', default=False, enable_events=True, key='Family', font='Any 12', size=(10, 1))],
 
           [sg.Text('Cover Range', font='Any 12'),
-           sg.Radio('Adult-Only', 'Radio3', default=False, enable_events=True, key='Adult', font='Any 12', size=(10, 1)),
-           sg.Radio('Child-Only', 'Radio3', default=False, enable_events=True, key='Child', font='Any 12', size=(10, 1)),
+           sg.Radio('Adult-Only', 'Radio3', default=False, enable_events=True, key='Adult', font='Any 12',
+                    size=(10, 1)),
+           sg.Radio('Child-Only', 'Radio3', default=False, enable_events=True, key='Child', font='Any 12',
+                    size=(10, 1)),
            sg.Radio('Adult&Child', 'Radio3', default=False, enable_events=True, key='Adult_Child', font='Any 12',
-                       size=(10, 1))],
+                    size=(10, 1))],
 
           [sg.Text('Metal Level', font='Any 12'), sg.Combo(('Platinum', 'Gold', 'Silver', 'Bronze', 'Catastrophic',
                                                             'High(Dental Only Applicable)',
@@ -56,8 +55,7 @@ layout = [[sg.Menu(menu_def, tearoff=True)],
                                                            size=(18, 7)),
            sg.Text('Monthly Premium', font='Any 12'), sg.Combo(('Lowest', 'Moderate', 'Highest'),
                                                                enable_events=True, key='Monthly_Premium', font='Any 12',
-                                                               size=(15, 3))
-           ],
+                                                               size=(15, 3))],
 
           [sg.Text('Maximum Out of Pocket', font='Any 12'), sg.InputText(key='MOOP', size=(9, 1)),
            sg.Text('Primary Subscriber Age', font='Any 12', size=(20, 1)), sg.InputText(key='Age', size=(5, 1))],
@@ -67,12 +65,12 @@ layout = [[sg.Menu(menu_def, tearoff=True)],
           [sg.Text('Advanced Search Options', font='Any 12')],
           [sg.Checkbox('Wellness Program', default=False, enable_events=True, key='Wellness', font='Any 12',
                        size=(15, 1)),
-           sg.Checkbox('Tobacco Usage', default=False, enable_events=True, key='Individual_Tobacco', font='Any 12',
+           sg.Checkbox('Tobacco Usage', default=False, enable_events=True, key='Tobacco', font='Any 12',
                        size=(12, 1)),
            sg.Checkbox('Pregnancy', default=False, enable_events=True, key='Pregnancy', font='Any 12', size=(10, 1)),
-           sg.Checkbox('National Network', default=False, enable_events=True, key='Network', font='Any 11',
+           sg.Checkbox('National Network', default=False, enable_events=True, key='National_Network', font='Any 11',
                        size=(13, 1)),
-           sg.Checkbox('Out of Country', default=False, enable_events=True, key='OutofCountry', font='Any 11',
+           sg.Checkbox('Out of Country', default=False, enable_events=True, key='Out_of_Country', font='Any 11',
                        size=(11, 1))],
 
           [sg.Text('Exchange Preference', font='Any 12'),
@@ -103,7 +101,81 @@ layout = [[sg.Menu(menu_def, tearoff=True)],
 # Implementation function
 # Function for processing user interface return values
 def values_processing(values):
-    pass
+    input = {
+        "State": '',
+        "HIOS": '',
+        "Plan_Id": '',
+        "Dental": False,
+        "Medical": False,
+        "Individual": False,
+        "Family": False,
+        "Adult": False,
+        "Child": False,
+        "Adult_Child": False,
+        "Metal_Level": '',
+        "Month_Premium": '',
+        "MOOP": '',
+        "Age": '',
+        "Family_Type": '',
+        "Wellness": False,
+        "Tobacco": False,
+        "Pregnancy": False,
+        "National_Network": False,
+        "Out_of_Country": False,
+        "Exchange": '',
+        "Disease": '',
+        "Copay": '',
+        "Coin": ''
+    }
+    if values['State']:
+        input['State'] = values['State']
+    elif values['HIOS']:
+        input['HIOS'] = values['HIOS']
+    elif values['Plan']:
+        input['Plan_Id'] = values['Plan']
+    elif values['Dental']:
+        input['Dental'] = True
+    elif values['Medical']:
+        input['Medical'] = True
+    elif values['Individual']:
+        input['Individual'] = True
+    elif values['Family']:
+        input['Family'] = True
+    elif values['Adult']:
+        input['Adult'] = True
+    elif values['Child']:
+        input['Child'] = True
+    elif values['Adult_Child']:
+        input['Adult_Child'] = True
+    elif values['Metal_Level']:
+        input['Metal_Level'] = values['Metal_Level']
+    elif values['Monthly_Premium']:
+        input['Monthly_Premium'] = values['Monthly_Premium']
+    elif values['MOOP']:
+        input['MOOP'] = values['MOOP']
+    elif values['Age']:
+        input['Age'] = values['Age']
+    elif values['Family_Type']:
+        input['Family_Type'] = values['Family_Type']
+    elif values['Wellness']:
+        input['Wellness'] = True
+    elif values['Tobacco']:
+        input['Tobacco'] = True
+    elif values['Pregnancy']:
+        input['Pregnancy'] = True
+    elif values['National_Network']:
+        input['National_Network'] = True
+    elif values['Out_of_Country']:
+        input['Out_of_Country'] = True
+    elif values['Exchange']:
+        input['Exchange'] = values['Exchange']
+    elif values['Disease']:
+        input['Disease'] = values['Disease']
+    elif values['Copay']:
+        input['Copay'] = values['Copay']
+    elif values['Coin']:
+        input['Coin'] = values['Coin']
+    return input
 
 
 # ==========================================================================================================
@@ -116,6 +188,9 @@ while True:
         break
     elif event == 'Search':
         # TODO: Gathering the return values here
+        parameters = values_processing(values)
+        print(parameters)
+
         # TODO: Query goes here
         number_result = 1
         result = "CDPHP student plan"

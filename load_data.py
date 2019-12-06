@@ -3,6 +3,7 @@ import psycopg2
 import psycopg2.extras
 
 import constants as const
+from datetime import datetime
 from enumeration import Enum
 from psycopg2.extensions import AsIs
 
@@ -57,7 +58,9 @@ def add_plan_general_info(cursor, raw):
     else:
         return False
 
-    # TODO plan[constants.IMPORT_DATE] = raw[]
+    if raw[const.CSV_IMPORT_DATE].strip():
+        ts = datetime.strptime(raw[const.CSV_IMPORT_DATE], "%m/%d/%Y %H:%M")
+        plan[const.IMPORT_DATE] = ts.strftime("%Y-%m-%d %H:%M:%S")
 
     if raw[const.CSV_HIOS_PROD_ID].strip():
         plan[const.HIOS_PROD_ID] = raw[const.CSV_HIOS_PROD_ID]
@@ -147,8 +150,11 @@ def add_plan_general_info(cursor, raw):
     if raw[const.CSV_SECOND_TIER_UTIL].strip():
         plan[const.SECOND_TIER_UTIL] = raw[const.CSV_SECOND_TIER_UTIL].rstrip("%")
 
-    # TODO effective_date
-    # TODO expiration_date
+    if raw[const.CSV_EFFECTIVE_DATE].strip():
+        plan[const.EFFECTIVE_DATE] = raw[const.CSV_EFFECTIVE_DATE]
+
+    if raw[const.CSV_EXPIRATION_DATE].strip():
+        plan[const.EXPIRATION_DATE] = raw[const.CSV_EXPIRATION_DATE]
 
     print(plan)
 

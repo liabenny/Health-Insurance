@@ -41,8 +41,6 @@ Const.TABLE_COINS_TYPE = "coin_type"
 Const.TABLE_LIMIT_UNIT_TYPE = "limit_unit_type"
 Const.TABLE_DESIGN_TYPE = "design_type"
 
-
-
 # Constants - TABLE ATTRIBUTES - Plans
 Const.PLAN_ID = "plan_id"
 Const.PLAN_VAR_NAME = "plan_variant_name"

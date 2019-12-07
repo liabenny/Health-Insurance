@@ -4,31 +4,25 @@ import tabulate as tabulate
 
 class Query:
     """
-    @:arg: option
+    @:arg: request
     @:type: dictionary
     """
-    def __init__(self, option):
-        self.option = option
+    def __init__(self, request):
+        self.request = request
 
-    def run_option1(self):
+    def run_query(self):
+        print("Begin to query")
+        self.build_str()
         pass
 
-    def run_option2(self):
+    def build_str(self):
         pass
 
-    def run_option3(self):
+    def get_select(self):
         pass
 
-    def run_option4(self):
+    def get_from(self):
         pass
 
-    def run_option5(self):
+    def get_where(self):
         pass
-
-    def run_option6(self):
-        pass
-
-    def print_result(self, res_list):
-        header_list = []
-        print("-------------Search Result-------------")
-        print(tabulate(res_list, headers=header_list, showindex="always"))

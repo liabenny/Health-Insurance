@@ -245,38 +245,38 @@ ALTER TABLE issuer
 
 CREATE TABLE plans
 (
-    plan_id                              CHAR(17),
-    plan_variant_name                    VARCHAR(63),
-    std_component_id                     CHAR(14),
-    plan_marketing_name                  VARCHAR(63),
-    year                                 CHAR(4),
-    state                                CHAR(2),
-    source_name                          INT REFERENCES source_name_type (id),
-    import_date                          TIMESTAMP,
-    hios_product_id                      CHAR(10),
-    hpid                                 CHAR(10),
-    network_id                           CHAR(6),
-    service_area_id                      CHAR(6),
-    formulary_id                         CHAR(6),
-    is_new_plan                          BOOLEAN,
-    market_coverage                      INT REFERENCES market_coverage_type (id),
-    plan_type                            INT REFERENCES plan_type (id),
-    qhp_type                             INT REFERENCES qhp_type (id),
-    design_type                          INT REFERENCES design_type (id),
-    child_only_offering                  INT REFERENCES child_only_offering_type (id),
-    composite_rate_offered               BOOLEAN,
-    out_of_country_coverage              BOOLEAN,
-    out_of_country_coverage_desc         TEXT,
-    out_of_service_area_coverage         BOOLEAN,
-    out_of_service_area_coverage_desc    TEXT,
-    plan_level_exclusions                VARCHAR(255),
-    est_advanced_payment_for_indian_plan DECIMAL(5, 2),
-    csr_variant_type                     INT,
-    multiple_in_network_tiers            BOOLEAN,
-    first_tier_utilization               INT,
-    second_tier_utilization              INT,
-    effective_date                       DATE,
-    expiration_date                      DATE,
+    plan_id                           CHAR(17),
+    plan_variant_name                 VARCHAR(127),
+    std_component_id                  CHAR(14),
+    plan_marketing_name               VARCHAR(127),
+    year                              CHAR(4),
+    state                             CHAR(2),
+    source_name                       INT REFERENCES source_name_type (id),
+    import_date                       TIMESTAMP,
+    hios_product_id                   CHAR(10),
+    hpid                              CHAR(10),
+    network_id                        CHAR(6),
+    service_area_id                   CHAR(6),
+    formulary_id                      CHAR(6),
+    is_new_plan                       BOOLEAN,
+    market_coverage                   INT REFERENCES market_coverage_type (id),
+    plan_type                         INT REFERENCES plan_type (id),
+    qhp_type                          INT REFERENCES qhp_type (id),
+    design_type                       INT REFERENCES design_type (id),
+    child_only_offering               INT REFERENCES child_only_offering_type (id),
+    composite_rate_offered            BOOLEAN,
+    out_of_country_coverage           BOOLEAN,
+    out_of_country_coverage_desc      TEXT,
+    out_of_service_area_coverage      BOOLEAN,
+    out_of_service_area_coverage_desc TEXT,
+    plan_level_exclusions             TEXT,
+--     est_advanced_payment_for_indian_plan DECIMAL(5, 2),
+    csr_variant_type                  INT,
+    multiple_in_network_tiers         BOOLEAN,
+    first_tier_utilization            DECIMAL(5, 2),
+    second_tier_utilization           DECIMAL(5, 2),
+    effective_date                    DATE,
+    expiration_date                   DATE,
     PRIMARY KEY (plan_id)
 );
 
@@ -297,14 +297,14 @@ CREATE TABLE medical_plans
 ALTER TABLE medical_plans
     OWNER TO manager;
 
-CREATE TABLE medical_plan_referal
+CREATE TABLE medical_plan_referral
 (
-    plan_id            CHAR(17) REFERENCES plans (plan_id),
-    specialist_referal VARCHAR(255),
+    plan_id             CHAR(17) REFERENCES plans (plan_id),
+    specialist_referral TEXT,
     PRIMARY KEY (plan_id)
 );
 
-ALTER TABLE medical_plan_referal
+ALTER TABLE medical_plan_referral
     OWNER TO manager;
 
 CREATE TABLE medical_plan_disease
@@ -398,9 +398,11 @@ CREATE TABLE medical_plan_ded
     medical_inn_tier1_individual           INT,
     medical_inn_tier1_family_per_person    INT,
     medical_inn_tier1_family_per_group     INT,
+    medical_inn_tier1_coinsurance          INT,
     medical_inn_tier2_individual           INT,
     medical_inn_tier2_family_per_person    INT,
     medical_inn_tier2_family_per_group     INT,
+    medical_inn_tier2_coinsurance          INT,
     medical_oon_individual                 INT,
     medical_oon_family_per_person          INT,
     medical_oon_family_per_group           INT,
@@ -411,9 +413,11 @@ CREATE TABLE medical_plan_ded
     drug_inn_tier1_individual              INT,
     drug_inn_tier1_family_per_person       INT,
     drug_inn_tier1_family_per_group        INT,
+    drug_inn_tier1_coinsurance             INT,
     drug_inn_tier2_individual              INT,
     drug_inn_tier2_family_per_person       INT,
     drug_inn_tier2_family_per_group        INT,
+    drug_inn_tier2_coinsurance             INT,
     drug_oon_individual                    INT,
     drug_oon_family_per_person             INT,
     drug_oon_family_per_group              INT,
@@ -432,9 +436,11 @@ CREATE TABLE medical_plan_ded_integrated
     total_inn_tier1_individual           INT,
     total_inn_tier1_family_per_person    INT,
     total_inn_tier1_family_per_group     INT,
+    total_inn_tier1_coinsurance          INT,
     total_inn_tier2_individual           INT,
     total_inn_tier2_family_per_person    INT,
     total_inn_tier2_family_per_group     INT,
+    total_inn_tier2_coinsurance          INT,
     total_oon_individual                 INT,
     total_oon_family_per_person          INT,
     total_oon_family_per_group           INT,
@@ -629,7 +635,10 @@ VALUES (3, 'Silver');
 INSERT INTO medical_metal_level_type
 VALUES (4, 'Bronze');
 INSERT INTO medical_metal_level_type
-VALUES (5, 'Catastrophic');
+VALUES (5, 'Expanded Bronze');
+INSERT INTO medical_metal_level_type
+VALUES (6, 'Catastrophic');
+
 INSERT INTO dental_metal_level_type
 VALUES (1, 'High');
 INSERT INTO dental_metal_level_type

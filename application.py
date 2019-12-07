@@ -1,199 +1,83 @@
-import PySimpleGUI as sg
-
-# Type Definition
-menu_def = [['&File', ['&Open', '&Save', 'E&xit', 'Properties']],
-            ['&Edit', ['Paste', ['Special', 'Normal', ], 'Undo'], ],
-            ['&Help', '&About...'], ]
-
-# TODO: Determined family only info
-family_layout = [sg.Text('Family Type', font='Any 12'),
-                 sg.Combo(('Couple', 'PrimarySubscriberAndOneDependent', 'PrimarySubscriberAndTwoDependents',
-                           'PrimarySubscriberAndThreeOrMoreDependents',
-                           'CoupleAndOneDependent', 'CoupleAndTwoDependents', 'CoupleAndThreeOrMoreDependents'),
-                          enable_events=True, key='Family_Type', font='Any 12',
-                          size=(28, 7))],
-
-# Layout Design
-# sg.change_look_and_feel('DarkAmber')  # Add a touch of color
-# All the stuff inside your window.
-layout = [[sg.Menu(menu_def, tearoff=True)],
-
-          [sg.Text('Healthcare Insurance Database System\n', font=("Helvetica", 16))],
-
-          [sg.Text('State Code', font='Any 12'),
-           sg.Combo(('AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA',
-                     'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM',
-                     'NY',
-                     'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV',
-                     'WI', 'WY'),
-                    enable_events=True, key='State', font='Any 12', size=(10, 5)),
-           sg.Text("HIOS ID", font='Any 12'), sg.InputText(key='HIOS', size=(20, 1)),
-           sg.Text("Plan ID", font='Any 12'), sg.InputText(key='Plan', size=(20, 1))],
-
-          [sg.Text('Insurance Type', font='Any 12'),
-           sg.Radio('Dental Only', 'Radio1', default=False, enable_events=True, key='Dental', font='Any 12',
-                    size=(10, 1)),
-           sg.Radio('Medical', 'Radio1', default=False, enable_events=True, key='Medical', font='Any 12',
-                    tooltip='Contains both medical and dental plan', size=(10, 1))],
-          [sg.Text('Subscriber Type', font='Any 12'),
-           sg.Radio('Individual', 'Radio2', default=False, enable_events=True, key='Individual', font='Any 12',
-                    size=(10, 1)),
-           sg.Radio('Family', 'Radio2', default=False, enable_events=True, key='Family', font='Any 12', size=(10, 1))],
-
-          [sg.Text('Cover Range', font='Any 12'),
-           sg.Radio('Adult-Only', 'Radio3', default=False, enable_events=True, key='Adult', font='Any 12',
-                    size=(10, 1)),
-           sg.Radio('Child-Only', 'Radio3', default=False, enable_events=True, key='Child', font='Any 12',
-                    size=(10, 1)),
-           sg.Radio('Adult&Child', 'Radio3', default=False, enable_events=True, key='Adult_Child', font='Any 12',
-                    size=(10, 1))],
-
-          [sg.Text('Metal Level', font='Any 12'), sg.Combo(('Platinum', 'Gold', 'Silver', 'Bronze', 'Catastrophic',
-                                                            'High(Dental Only Applicable)',
-                                                            'Low(Dental Only Applicable)'),
-                                                           enable_events=True, key='Metal_Level', font='Any 12',
-                                                           size=(18, 7)),
-           sg.Text('Monthly Premium', font='Any 12'), sg.Combo(('Lowest', 'Moderate', 'Highest'),
-                                                               enable_events=True, key='Monthly_Premium', font='Any 12',
-                                                               size=(15, 3))],
-
-          [sg.Text('Maximum Out of Pocket', font='Any 12'), sg.InputText(key='MOOP', size=(9, 1)),
-           sg.Text('Primary Subscriber Age', font='Any 12', size=(20, 1)), sg.InputText(key='Age', size=(5, 1))],
-
-          [sg.Frame('Family Only', family_layout, font='Any 12')],
-
-          [sg.Text('Advanced Search Options', font='Any 12')],
-          [sg.Checkbox('Wellness Program', default=False, enable_events=True, key='Wellness', font='Any 12',
-                       size=(15, 1)),
-           sg.Checkbox('Tobacco Usage', default=False, enable_events=True, key='Tobacco', font='Any 12',
-                       size=(12, 1)),
-           sg.Checkbox('Pregnancy', default=False, enable_events=True, key='Pregnancy', font='Any 12', size=(10, 1)),
-           sg.Checkbox('National Network', default=False, enable_events=True, key='National_Network', font='Any 11',
-                       size=(13, 1)),
-           sg.Checkbox('Out of Country', default=False, enable_events=True, key='Out_of_Country', font='Any 11',
-                       size=(11, 1))],
-
-          [sg.Text('Exchange Preference', font='Any 12'),
-           sg.Combo(('On Exchange', 'Off Exchange', 'Both'), enable_events=True, key='Exchange', font='Any 12',
-                    size=(10, 3)),
-           sg.Text('Disease', font='Any 12'),
-           sg.Combo(
-               ('Asthma', 'Heart Disease', 'Fracture', 'Diabetes', 'Depression', 'Weight Loss', 'High Blood Pressure',
-                'High Cholesterol'), enable_events=True, key='Disease', font='Any 12',
-               size=(14, 5))
-           ],
-
-          [sg.Text('Copay Preference', font='Any 12'),
-           sg.Combo(('No Charge', 'No Charge after deductible', 'Copay with deductible'), enable_events=True,
-                    key='Copay', font='Any 12', size=(18, 3)),
-
-           sg.Text('Coinsurance Preference', font='Any 12'),
-           sg.Combo(('No Charge', 'No Charge after deductible', 'Fixed %',
-                     'Fixed % of Coinsurance after deductible'), enable_events=True, key='Coin', font='Any 12',
-                    size=(20, 5))],
-
-          [sg.Button('Search', font='Any 12'), sg.Button('Cancel', font='Any 12')],
-
-          [sg.Text('\n\n\n\n\n\n\nCopyright: Liangbin Zhu, Yujue Wang @ 2019FALL RPI', font=("Helvetica", 8))]]
+import database as db
+from tabulate import tabulate
 
 
-# ==========================================================================================================
-# Implementation function
-# Function for processing user interface return values
-def values_processing(values):
-    input = {
-        "State": '',
-        "HIOS": '',
-        "Plan_Id": '',
-        "Dental": False,
-        "Medical": False,
-        "Individual": False,
-        "Family": False,
-        "Adult": False,
-        "Child": False,
-        "Adult_Child": False,
-        "Metal_Level": '',
-        "Month_Premium": '',
-        "MOOP": '',
-        "Age": '',
-        "Family_Type": '',
-        "Wellness": False,
-        "Tobacco": False,
-        "Pregnancy": False,
-        "National_Network": False,
-        "Out_of_Country": False,
-        "Exchange": '',
-        "Disease": '',
-        "Copay": '',
-        "Coin": ''
-    }
-    if values['State']:
-        input['State'] = values['State']
-    elif values['HIOS']:
-        input['HIOS'] = values['HIOS']
-    elif values['Plan']:
-        input['Plan_Id'] = values['Plan']
-    elif values['Dental']:
-        input['Dental'] = True
-    elif values['Medical']:
-        input['Medical'] = True
-    elif values['Individual']:
-        input['Individual'] = True
-    elif values['Family']:
-        input['Family'] = True
-    elif values['Adult']:
-        input['Adult'] = True
-    elif values['Child']:
-        input['Child'] = True
-    elif values['Adult_Child']:
-        input['Adult_Child'] = True
-    elif values['Metal_Level']:
-        input['Metal_Level'] = values['Metal_Level']
-    elif values['Monthly_Premium']:
-        input['Monthly_Premium'] = values['Monthly_Premium']
-    elif values['MOOP']:
-        input['MOOP'] = values['MOOP']
-    elif values['Age']:
-        input['Age'] = values['Age']
-    elif values['Family_Type']:
-        input['Family_Type'] = values['Family_Type']
-    elif values['Wellness']:
-        input['Wellness'] = True
-    elif values['Tobacco']:
-        input['Tobacco'] = True
-    elif values['Pregnancy']:
-        input['Pregnancy'] = True
-    elif values['National_Network']:
-        input['National_Network'] = True
-    elif values['Out_of_Country']:
-        input['Out_of_Country'] = True
-    elif values['Exchange']:
-        input['Exchange'] = values['Exchange']
-    elif values['Disease']:
-        input['Disease'] = values['Disease']
-    elif values['Copay']:
-        input['Copay'] = values['Copay']
-    elif values['Coin']:
-        input['Coin'] = values['Coin']
-    return input
+# User Input
+# setup the main menu list for healthcare insurance system query
+def print_menu_list():
+    print("Welcome to Healthcare Insurance Database System!")
+    print("Insurance Search List:")
+    header_list = ["Insurance Type", "Subscriber Type", "Cover Range", "Metal Level", "Wellness Program",
+                   "Exchange Preference", "Out of Country", "Payment type", "Tier1", "Tier2", "Out of Net",
+                   "Plan Description"]
+    # 1
+    option1 = ["Medical", "Individual", "Adult Only", "Catastrophic", "NO", "YES", "NO", "NOT APPLICABLE",
+               "No Charge after deductible", "Not Applicable", "Not Applicable", "No",
+               "Low monthly premiums and very high deductibles"]
+    # 2
+    option2 = ["Medical", "Family", "Adult and Child", "Bronze", "NO", "YES", "NO", "Copay", ""]
+    # 3
+    option3 = ["Medical", "Family", "Adult and Child", "Platinum", "YES", "NO", "YES", "Coinsurance",
+               "No Charge after deductible"]
+    # 4
+    option4 = ["Dental", "Individual", "Child Only", "High", "NOT APPLICABLE", "BOTH", "NO", ]
+    # 5
+    option5 = ["Dental", "Individual", "Adult Only", "High", "NOT APPLICABLE", "NO", "NO", ]
+    # 6
+    option6 = ["Dental", "Family", "Adult and Child", "Low", "NOT APPLICABLE", "YES", "NO", ]
+
+    table = [option1, option2, option3, option4, option5, option6]
+    print(tabulate(table, headers=header_list))
 
 
-# ==========================================================================================================
-# Create the Window
-window = sg.Window('Insurance Finder', layout, size=(800, 600))
-# Event Loop to process "events" and get the "values" of the inputs
-while True:
-    event, values = window.read()
-    if event in (None, 'Cancel'):  # if user closes window or clicks cancel
-        break
-    elif event == 'Search':
-        # TODO: Gathering the return values here
-        parameters = values_processing(values)
-        print(parameters)
+# Function tailored to get the parameters for each options
+def get_option1():
+    pass
 
-        # TODO: Query goes here
-        number_result = 1
-        result = "CDPHP student plan"
-        sg.Popup('Search Results', 'We found %d insurance for you\n%s' % (number_result, result))
 
-window.close()
+def get_option2():
+    pass
+
+
+def get_option3():
+    pass
+
+
+def get_option4():
+    pass
+
+
+def get_option5():
+    pass
+
+
+def get_option6():
+    pass
+
+
+# Function for processing the user input
+def input_processing(user_input):
+    if user_input == '1':
+        db.Query.option_1(get_option1())
+    elif user_input == '2':
+        db.Query.option_2(get_option2())
+    elif user_input == '3':
+        db.Query.option_3(get_option3())
+    elif user_input == '4':
+        db.Query.option_4(get_option4())
+    elif user_input == '5':
+        db.Query.option_5(get_option5())
+    elif user_input == '6':
+        db.Query.option_6(get_option6())
+    else:
+        print("Oops, Something is going wrong here :(")
+
+
+def main():
+    while (True):
+        print_menu_list()
+        user_input = input("Please enter the option number: ")
+        input_processing(user_input)
+
+
+main()

@@ -1,4 +1,32 @@
 # Do this for fun
+"""
+input_dict = {
+    "State": '', #TODO: plans.state
+    "HIOS": '', #TODO: plans.hios_product_id
+    "Plan_Id": '', #TODO: plans.plan_id
+    "Dental": False, #TODO: plans.plan_type
+    "Medical": False, #TODO: plans.plan_type
+    "Individual": False, #TODO: plans.market_coverage
+    "Family": False, #TODO: plans.market_coverage
+    "Adult": False,#TODO: plans.child_only_offering
+    "Child": False, #TODO: plans.child_only_offering
+    "Adult_Child": False,#TODO: plans.child_only_offering
+    "Metal_Level": '', #TODO: medical_plans.metal_level & dental_plans.metal_level
+    "Month_Premium": '', #TODO: rate_family.individual & rate_individual.individual_rate & rate_individual.individual_tobacco_rate
+    "MOOP": '', #TODO: medical_plan_moop & medical_plan_moop_integrated
+    "Age": '', #TODO: rate_individual & age_type
+    "Family_Type": '', #TODO: rate_family & family_type
+    "Wellness": False, #TODO: medical_plans.is_wellness_program_offered
+    "Tobacco": False, #TODO: rate_individual.tobacco
+    "Pregnancy": False, #TODO:medical_plans.is_notice_required_for_pregnancy
+    "National_Network": False, #TODO: No support data
+    "Out_of_Country": False,#TODO:plans.out_of_country_coverage
+    "Exchange": '',#TODO: qhp_type
+    "Disease": '',#TODO: medical_plan_disease
+    "Copay": '',#TODO: medical_plan_sbc & plan_benefit & copay_type
+    "Coin": ''#TODO: coin_type & medical_plan_sbc & plan_benefit
+}
+"""
 import PySimpleGUI as sg
 import database as db
 

@@ -1,68 +1,140 @@
-import PySimpleGUI as sg
+import database as db
+from tabulate import tabulate
 
-# Type Definition
-menu_def = [['&File', ['&Open', '&Save', 'E&xit', 'Properties']],
-            ['&Edit', ['Paste', ['Special', 'Normal', ], 'Undo'], ],
-            ['&Help', '&About...'], ]
 
-# TODO: Determined individual only info
-individual_layout = [
-    [sg.Text('Text inside of a frame')],
-    [sg.Checkbox('Dental Only', default=False, enable_events=True, key='Dental', size=(10, 1)),
-     sg.Checkbox('Tobacco Usage', default=False, enable_events=True, key='Individual_Tobacco', size=(10, 1))],
-    [sg.Text('Age'), sg.InputText(key='Age', size=(5, 1))],
-]
+# Helper Function
+def list_to_dict(keys, user_input):
+    """
+    :param keys, user_input: list, list
+    :return: dictionary
+    """
+    res = {keys[i]: user_input[i] for i in range(len(keys))}
+    return res
 
-#TODO: Determined family only info
-family_layout = []
 
-# Layout Design
-sg.change_look_and_feel('DarkAmber')  # Add a touch of color
-# All the stuff inside your window.
-layout = [[sg.Text('Medical Insurance Finder Database System')],
-          [sg.Menu(menu_def, tearoff=True)],
-           # TODO: State Code -> Combo
-          [sg.Text('Insurance Type'),
-           sg.Checkbox('Dental Only', default=False, enable_events=True, key='Dental', size=(10, 1)),
-           sg.Checkbox('Medical', default=False, enable_events=True, key='Medical',
-                       tooltip='Contains both medical and dental plan', size=(10, 1))],
+# User Input
+# setup the main menu list for healthcare insurance system query
+def print_menu_list(header_list, user_input):
+    print("************************Insurance Search List:************************")
+    print(tabulate(user_input, headers=header_list, showindex="always"))
 
-          [sg.Text('Cover Range'),
-           sg.Checkbox('Adult', default=False, enable_events=True, key='Adult', size=(10, 1)),
-           sg.Checkbox('Child', default=False, enable_events=True, key='Child', size=(10, 1)),
-           sg.Checkbox('Both', default=False, enable_events=True, key='Adult_Child', size=(10, 1))],
 
-          [sg.Text('Metal Level'), sg.Combo(('Platinum', 'Gold', 'Silver', 'Bronze', 'Catastrophic',
-                                             'High(Dental Only Applicable)', 'Low(Dental Only Applicable)'),
-                                            enable_events=True, key='combo1', size=(15, 3))],
-        # TODO: To Be Determined
-          [sg.Text('Monthly Premium'), sg.Combo(('Lowest', 'Moderate', 'Highest'),
-                                                enable_events=True, key='combo2', size=(15, 3))],
+def get_insurance_type():
+    values = [["Medical"], ["Dental"]]
+    print(tabulate(values, headers=["Insurance Type"], showindex="always"))
+    num = input("-Please enter the insurance type number: ")
+    return values[int(num)][0]
 
-          [sg.Frame('Individual Only', individual_layout, font='Any 11')],
-          [sg.Frame('Family Only', family_layout, font='Any 11')],
 
-          [sg.Text('Advanced Search Options')],
-          [sg.Checkbox('Exchange', default=False, enable_events=False, key='Exchange', size=(10, 1)),
-           sg.Checkbox('Out of Country Coverage', default=False, enable_events=False, key='OutofCountry',
-                       size=(10, 1))],
-          [sg.Text('Type Preference'), sg.Combo(('Copay', 'Coinsurance'),
-                                                enable_events=True, key='combo3', size=(10, 3))],
+def get_subscriber():
+    values = [["Individual"], ["Family"]]
+    print(tabulate(values, headers=["Primary Subscriber"], showindex="always"))
+    num = input("-Please enter the primary subscriber number: ")
+    return values[int(num)][0]
 
-          [sg.Button('Search'), sg.Button('Cancel')]]
 
-# Create the Window
-window = sg.Window('Insurance Finder', layout)
-# Event Loop to process "events" and get the "values" of the inputs
-while True:
-    event, values = window.read()
-    if event in (None, 'Cancel'):  # if user closes window or clicks cancel
-        break
-    elif event == 'Search':
-        #TODO: Gathering the return values here
-        #TODO: Query goes here
-        number_result = 1
-        result = "CDPHP student plan"
-        sg.Popup('Search Results', 'We found %d insurance for you\n%s' % (number_result, result))
+def get_cover_range():
+    values = [["Adult and Child"], ["Child Only"], ["Adult Only"]]
+    print(tabulate(values, headers=["Cover Range"], showindex="always"))
+    num = input("-Please enter the cover range number: ")
+    return values[int(num)][0]
 
-window.close()
+
+def get_metal_level():
+    values = [['Platinum(Medical Only Applicable)'], ['Gold(Medical Only Applicable)'],
+              ['Silver(Medical Only Applicable)'], ['Bronze(Medical Only Applicable)'],
+              ['Catastrophic(Medical Only Applicable)'],
+              ['High(Dental Only Applicable)'],
+              ['Low(Dental Only Applicable)']]
+    print(tabulate(values, headers=["Metal Level"], showindex="always"))
+    num = input("-Please enter the metal level number: ")
+    return values[int(num)][0]
+
+
+def get_wellness():
+    while True:
+        num = input("-Whether need wellness program (YES/NO): ")
+        if num not in ("YES", "NO"):
+            print("Oops Wrong input!")
+            continue
+        else:
+            break
+    return num
+
+
+def get_out_of_country():
+    while True:
+        num = input("-Whether need out of country coverage (YES/NO): ")
+        if num not in ("YES", "NO"):
+            print("Oops Wrong input!")
+            continue
+        else:
+            break
+    return num
+
+
+def get_exchange():
+    values = [['On Exchange'], ['Off Exchange'], ['Both']]
+    print(tabulate(values, headers=["Exchange Preference"], showindex="always"))
+    num = input("-Please enter the exchange preference number: ")
+    return values[int(num)][0]
+
+
+def get_payment():
+    values = [["Copay"], ["Coin"]]
+    print(tabulate(values, headers=["Payment Type"], showindex="always"))
+    num = input("-Please enter the payment type number: ")
+    return values[int(num)][0]
+
+
+def get_state():
+    state_list = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA',
+                  'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM',
+                  'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV',
+                  'WI', 'WY']
+    while True:
+        state = input("-Please enter the state code: ")
+        if state not in state_list:
+            print("Oops Wrong State Code!")
+            continue
+        else:
+            break
+    return state
+
+
+def get_family_type():
+    header_list = ["Family Type"]
+    value_list = [['Couple'], ['PrimarySubscriberAndOneDependent'], ['PrimarySubscriberAndTwoDependents'],
+                  ['PrimarySubscriberAndThreeOrMoreDependents'],
+                  ['CoupleAndOneDependent'], ['CoupleAndTwoDependents'], ['CoupleAndThreeOrMoreDependents']]
+    print(tabulate(value_list, headers=header_list, showindex="always"))
+    type = input("-Please enter the family type number: ")
+    return value_list[int(type)][0]
+
+
+def get_age():
+    age = input("-Please enter the subscriber age: ")
+    return age
+
+
+# Function for processing the user input
+def input_processing():
+    header_list = ["Insurance Type", "Subscriber", "Cover Range", "Metal Level", "Wellness Program",
+                   "Exchange", "Out of Country", "Payment Type", "Age", "State", "Family Type"]
+    print_menu_list(header_list, [])
+    user_input = [[get_insurance_type(), get_subscriber(), get_cover_range(), get_metal_level(),
+                   get_wellness(),
+                   get_exchange(), get_out_of_country(), get_payment(), get_age(), get_state(),
+                   get_family_type()]]
+    print_menu_list(header_list, user_input)
+    return list_to_dict(header_list, user_input[0])
+
+
+def main():
+    print("Welcome to Healthcare Insurance Database System!")
+    while True:
+        print("======Initializing new search======")
+        db.Query(input_processing()).run_query()
+
+
+main()

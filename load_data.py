@@ -9,7 +9,9 @@ from psycopg2.extensions import AsIs
 
 # file_name = "C:\\RPI\\Database-Systems\\project\\datasets\\Benefits_Cost_Sharing_PUF.csv"
 # file_name = "C:\\Study\\Database-Systems\\project\\datasets\\Plan_Attributes_PUF.csv"
-file_name = "2020-dataset/Plan_Attributes_PUF.csv"
+file_plan = "2020-dataset/Plan_Attributes_PUF.csv"
+file_benefits = "2020-dataset/Benefits_Cost_Sharing_PUF.csv"
+file_rate = "2020-dataset/Rate_PUF.csv"
 
 
 def save_data(table, attributes):
@@ -23,9 +25,9 @@ def save_data(table, attributes):
 
 
 def load_plans():
-    print("------LOAD PLAN ATTRIBUTES------")
+    print("------LOAD Plan_Attributes_PUF.csv------")
 
-    with open(file_name, mode='r') as fd:
+    with open(file_plan, mode='r', encoding='iso-8859-1') as fd:
         # Count total row number
         reader = csv.DictReader(fd)
         count = 0
@@ -40,6 +42,11 @@ def load_plans():
                 print("Fail")
                 break
 
+            # Plans that use multiple tiers
+            if raw_data[const.CSV_MULTI_NETWORK] == 'Yes':
+                add_plan_multi_network(raw_data)
+
+            # Divide plan into dental and medical
             if raw_data[const.CSV_DENTAL_ONLY] == "Yes":
                 # Is dental plan
                 add_dental_plan(raw_data)
@@ -73,10 +80,10 @@ def load_plans():
                 else:
                     add_medical_plan_ded(raw_data)
 
-            conn.commit()
             count += 1
             print('\rLoading Process:{:.2f}%'.format(count * 100 / rows), end='')
 
+    conn.commit()
     print("\nDONE!")
 
 
@@ -101,10 +108,8 @@ def add_plan_general_info(raw):
     if raw[const.CSV_PLAN_STATE].strip():
         attr[const.PLAN_STATE] = raw[const.CSV_PLAN_STATE]
 
-    if raw[const.CSV_SOURCE_NAME] in Enum.src_name_type:
-        attr[const.SOURCE_NAME] = Enum.src_name_type[raw[const.CSV_SOURCE_NAME]]
-    else:
-        return False
+    if raw[const.CSV_SOURCE_NAME].strip():
+        attr[const.SOURCE_NAME] = raw[const.CSV_SOURCE_NAME]
 
     if raw[const.CSV_IMPORT_DATE].strip():
         ts = datetime.strptime(raw[const.CSV_IMPORT_DATE], "%m/%d/%Y %H:%M")
@@ -184,20 +189,6 @@ def add_plan_general_info(raw):
     if raw[const.CSV_PLAN_EXCLUSIONS].strip():
         attr[const.PLAN_EXCLUSIONS] = raw[const.CSV_PLAN_EXCLUSIONS]
 
-    # if raw[const.CSV_EST_ADV_PAYMENT_INDIAN].strip():
-    #     plan[const.EST_ADV_PAYMENT_INDIAN] = raw[const.CSV_EST_ADV_PAYMENT_INDIAN].lstrip("$")
-
-    if raw[const.CSV_MULTI_NETWORK] == 'Yes':
-        attr[const.MULTI_NETWORK] = True
-    else:
-        attr[const.MULTI_NETWORK] = False
-
-    if raw[const.CSV_FIRST_TIER_UTIL].strip():
-        attr[const.FIRST_TIER_UTIL] = raw[const.CSV_FIRST_TIER_UTIL].rstrip("%")
-
-    if raw[const.CSV_SECOND_TIER_UTIL].strip():
-        attr[const.SECOND_TIER_UTIL] = raw[const.CSV_SECOND_TIER_UTIL].rstrip("%")
-
     if raw[const.CSV_EFFECTIVE_DATE].strip():
         attr[const.EFFECTIVE_DATE] = raw[const.CSV_EFFECTIVE_DATE]
 
@@ -207,6 +198,21 @@ def add_plan_general_info(raw):
     save_data(const.TABLE_PLAN, attr)
 
     return True
+
+
+def add_plan_multi_network(raw):
+    attr = dict()
+
+    if raw[const.CSV_PLAN_ID].strip():
+        attr[const.PLAN_ID] = raw[const.CSV_PLAN_ID]
+
+    if raw[const.CSV_FIRST_TIER_UTIL].strip():
+        attr[const.FIRST_TIER_UTIL] = raw[const.CSV_FIRST_TIER_UTIL].rstrip("%")
+
+    if raw[const.CSV_SECOND_TIER_UTIL].strip():
+        attr[const.SECOND_TIER_UTIL] = raw[const.CSV_SECOND_TIER_UTIL].rstrip("%")
+
+    save_data(const.TABLE_PLAN_MULTI_NET, attr)
 
 
 def add_dental_plan(raw):
@@ -369,7 +375,7 @@ def add_medical_plan_referral(raw):
     if raw[const.CSV_REFERRAL].strip():
         attr[const.REFERRAL] = raw[const.CSV_REFERRAL]
 
-    print(attr)
+    # print(attr)
 
     save_data(const.TABLE_M_PLAN_REFERRAL, attr)
 
@@ -690,11 +696,290 @@ def add_medical_plan_ded_int(raw):
 
 
 def load_benefits():
-    pass
+    print("------LOAD Benefits_Cost_Sharing_PUF.csv------")
+
+    with open(file_benefits, mode='r', encoding='iso-8859-1') as fd:
+        # Count total row number
+        reader = csv.DictReader(fd)
+        count = 0
+        rows = sum(1 for _ in reader)
+        fd.seek(0)
+
+        # Loading data into database
+        reader = csv.DictReader(fd)
+        for raw_data in reader:
+            if raw_data[const.CSV_IS_COVER] == 'Covered':
+                add_plan_benefits(raw_data)
+
+                if raw_data[const.CSV_QUANT_LIMIT] == 'Yes':
+                    add_plan_benefits_limit(raw_data)
+
+            count += 1
+            print('\rLoading Process:{:.2f}%'.format(count * 100 / rows), end='')
+
+    conn.commit()
+    print("\nDONE!")
 
 
-def load_rates():
-    pass
+def add_plan_benefits(raw):
+    attr = dict()
+
+    if raw[const.CSV_PLAN_ID].strip():
+        attr[const.PLAN_ID] = raw[const.CSV_PLAN_ID]
+
+    if raw[const.CSV_BENEFIT_NAME].strip():
+        attr[const.BENEFIT_NAME] = raw[const.CSV_BENEFIT_NAME].strip()
+
+    if raw[const.CSV_COPAY_INN_TIER1].strip():
+        attr[const.COPAY_INN_TIER1] = utils.get_num_decimal(raw[const.CSV_COPAY_INN_TIER1])
+        desc = utils.get_desc(raw[const.CSV_COPAY_INN_TIER1])
+        if desc == 'Not Applicable':
+            attr[const.COPAY_INN_TIER1] = None
+            attr[const.COPAY_INN_TIER1_TYPE] = Enum.copay_type[desc]
+        elif desc:
+            attr[const.COPAY_INN_TIER1_TYPE] = Enum.copay_type[desc]
+        else:
+            attr[const.COPAY_INN_TIER1_TYPE] = Enum.copay_type["Copay"]
+    else:
+        attr[const.COPAY_INN_TIER1] = None
+        attr[const.COPAY_INN_TIER1_TYPE] = Enum.copay_type["Not Applicable"]
+
+    if raw[const.CSV_COPAY_INN_TIER2].strip():
+        attr[const.COPAY_INN_TIER2] = utils.get_num_decimal(raw[const.CSV_COPAY_INN_TIER2])
+        desc = utils.get_desc(raw[const.CSV_COPAY_INN_TIER2])
+        if desc == 'Not Applicable':
+            attr[const.COPAY_INN_TIER1] = None
+            attr[const.COPAY_INN_TIER1_TYPE] = Enum.copay_type[desc]
+        elif desc:
+            attr[const.COPAY_INN_TIER2_TYPE] = Enum.copay_type[desc]
+        else:
+            attr[const.COPAY_INN_TIER1_TYPE] = Enum.copay_type["Copay"]
+    else:
+        attr[const.COPAY_INN_TIER2] = None
+        attr[const.COPAY_INN_TIER2_TYPE] = Enum.copay_type["Not Applicable"]
+
+    if raw[const.CSV_COPAY_OON].strip():
+        attr[const.COPAY_OON] = utils.get_num_decimal(raw[const.CSV_COPAY_OON])
+        desc = utils.get_desc(raw[const.CSV_COPAY_OON])
+        if desc == 'Not Applicable':
+            attr[const.COPAY_INN_TIER1] = None
+            attr[const.COPAY_INN_TIER1_TYPE] = Enum.copay_type[desc]
+        elif desc:
+            attr[const.COPAY_OON_TYPE] = Enum.copay_type[desc]
+        else:
+            attr[const.COPAY_INN_TIER1_TYPE] = Enum.copay_type["Copay"]
+    else:
+        attr[const.COPAY_OON] = None
+        attr[const.COPAY_OON_TYPE] = Enum.copay_type["Not Applicable"]
+
+    if raw[const.CSV_COINS_INN_TIER1].strip():
+        attr[const.COINS_INN_TIER1] = utils.get_num_decimal(raw[const.CSV_COINS_INN_TIER1])
+        desc = utils.get_desc(raw[const.CSV_COINS_INN_TIER1])
+        if desc == 'Not Applicable':
+            attr[const.COPAY_INN_TIER1] = None
+            attr[const.COPAY_INN_TIER1_TYPE] = Enum.coins_type[desc]
+        elif desc:
+            attr[const.COINS_INN_TIER1_TYPE] = Enum.coins_type[desc]
+        else:
+            attr[const.COPAY_INN_TIER1_TYPE] = Enum.coins_type["Coinsurance"]
+    else:
+        attr[const.COINS_INN_TIER1] = None
+        attr[const.COINS_INN_TIER1_TYPE] = Enum.coins_type["Not Applicable"]
+
+    if raw[const.CSV_COINS_INN_TIER2].strip():
+        attr[const.COINS_INN_TIER2] = utils.get_num_decimal(raw[const.CSV_COINS_INN_TIER2])
+        desc = utils.get_desc(raw[const.CSV_COINS_INN_TIER2])
+        if desc == 'Not Applicable':
+            attr[const.COPAY_INN_TIER1] = None
+            attr[const.COPAY_INN_TIER1_TYPE] = Enum.coins_type[desc]
+        elif desc:
+            attr[const.COINS_INN_TIER2_TYPE] = Enum.coins_type[desc]
+        else:
+            attr[const.COPAY_INN_TIER1_TYPE] = Enum.coins_type["Coinsurance"]
+    else:
+        attr[const.COINS_INN_TIER2] = None
+        attr[const.COINS_INN_TIER2_TYPE] = Enum.coins_type["Not Applicable"]
+
+    if raw[const.CSV_COINS_OON].strip():
+        attr[const.COINS_OON] = utils.get_num_decimal(raw[const.CSV_COINS_OON])
+        desc = utils.get_desc(raw[const.CSV_COINS_OON])
+        if desc == 'Not Applicable':
+            attr[const.COPAY_INN_TIER1] = None
+            attr[const.COPAY_INN_TIER1_TYPE] = Enum.coins_type[desc]
+        elif desc:
+            attr[const.COINS_OON_TYPE] = Enum.coins_type[desc]
+        else:
+            attr[const.COPAY_INN_TIER1_TYPE] = Enum.coins_type["Coinsurance"]
+    else:
+        attr[const.COINS_OON] = None
+        attr[const.COINS_OON_TYPE] = Enum.coins_type["Not Applicable"]
+
+    if raw[const.CSV_IS_EHB] == 'Yes':
+        raw[const.IS_EHB] = True
+    else:
+        raw[const.IS_EHB] = False
+
+    if raw[const.CSV_EXCL_FROM_INN_MOOP] == 'Yes':
+        raw[const.EXCL_FROM_INN_MOOP] = True
+    else:
+        raw[const.EXCL_FROM_INN_MOOP] = False
+
+    if raw[const.CSV_EXCL_FROM_OON_MOOP] == 'Yes':
+        raw[const.EXCL_FROM_OON_MOOP] = True
+    else:
+        raw[const.EXCL_FROM_OON_MOOP] = False
+
+    if raw[const.CSV_BENEFIT_EXCL].strip():
+        attr[const.BENEFIT_EXCL] = raw[const.CSV_BENEFIT_EXCL]
+
+    # print(attr)
+
+    save_data(const.TABLE_BENEFIT, attr)
+
+
+def add_plan_benefits_limit(raw):
+    attr = dict()
+
+    if raw[const.CSV_PLAN_ID].strip():
+        attr[const.PLAN_ID] = raw[const.CSV_PLAN_ID]
+
+    if raw[const.CSV_BENEFIT_NAME].strip():
+        attr[const.BENEFIT_NAME] = raw[const.CSV_BENEFIT_NAME].strip()
+
+    if raw[const.CSV_BENEFIT_LIMIT_QTY].strip():
+        attr[const.BENEFIT_LIMIT_QTY] = raw[const.CSV_BENEFIT_LIMIT_QTY]
+
+    if raw[const.CSV_BENEFIT_LIMIT_UNIT].strip():
+        attr[const.BENEFIT_LIMIT_UNIT] = raw[const.CSV_BENEFIT_LIMIT_UNIT]
+
+    if raw[const.CSV_BENEFIT_EXPLANATION].strip():
+        attr[const.BENEFIT_EXPLANATION] = raw[const.CSV_BENEFIT_EXPLANATION]
+
+    # print(attr)
+
+    save_data(const.TABLE_BENEFIT_LIMIT, attr)
+
+
+def load_rate():
+    print("------LOAD Rate_PUF.csv------")
+
+    with open(file_rate, mode='r', encoding='iso-8859-1') as fd:
+        # Count total row number
+        reader = csv.DictReader(fd)
+        count = 0
+        rows = sum(1 for _ in reader)
+        fd.seek(0)
+
+        # Loading data into database
+        reader = csv.DictReader(fd)
+        for raw_data in reader:
+            if raw_data[const.CSV_RATE_AGE] == 'Family Option':
+                # Family Rate
+                add_rate_family(raw_data)
+            else:
+                # Individual Rate
+                add_rate_individual(raw_data)
+
+            count += 1
+            print('\rLoading Process:{:.2f}%'.format(count * 100 / rows), end='')
+
+    conn.commit()
+    print("\nDONE!")
+
+
+def add_rate_individual(raw):
+    attr = dict()
+
+    if raw[const.CSV_RATE_EFF_DATE].strip():
+        attr[const.RATE_EFF_DATE] = raw[const.CSV_RATE_EFF_DATE]
+
+    if raw[const.CSV_RATE_EXPI_DATE].strip():
+        attr[const.RATE_EXPI_DATE] = raw[const.CSV_RATE_EXPI_DATE]
+
+    if raw[const.CSV_RATE_STD_COMP_ID].strip():
+        attr[const.RATE_STD_COMP_ID] = raw[const.CSV_RATE_STD_COMP_ID]
+
+    if raw[const.CSV_RATE_AREA_ID].strip():
+        attr[const.RATE_AREA_ID] = utils.get_num_int(raw[const.CSV_RATE_AREA_ID])
+
+    if raw[const.CSV_RATE_TOBACCO] == 'Tobacco User/Non-Tobacco User':
+        attr[const.RATE_TOBACCO] = True
+    else:
+        attr[const.RATE_TOBACCO] = False
+
+    if raw[const.CSV_RATE_AGE].strip():
+        age_pair = utils.get_age_pair(raw[const.CSV_RATE_AGE])
+        attr[const.RATE_AGE_FROM] = age_pair[0]
+        attr[const.RATE_AGE_TO] = age_pair[1]
+
+    if raw[const.CSV_RATE_INDI_RATE].strip():
+        attr[const.RATE_INDI_RATE] = raw[const.CSV_RATE_INDI_RATE]
+
+    if raw[const.CSV_RATE_INDI_TOBACCO_RATE].strip():
+        attr[const.RATE_INDI_TOBACCO_RATE] = raw[const.CSV_RATE_INDI_TOBACCO_RATE]
+
+    save_data(const.TABLE_RATE_INDIVIDUAL, attr)
+
+
+def add_rate_family(raw):
+    attr = dict()
+
+    if raw[const.CSV_RATE_EFF_DATE].strip():
+        attr[const.RATE_FAM_EFF_DATE] = raw[const.CSV_RATE_EFF_DATE]
+
+    if raw[const.CSV_RATE_EXPI_DATE].strip():
+        attr[const.RATE_FAM_EXPI_DATE] = raw[const.CSV_RATE_EXPI_DATE]
+
+    if raw[const.CSV_RATE_STD_COMP_ID].strip():
+        attr[const.RATE_FAM_STD_COMP_ID] = raw[const.CSV_RATE_STD_COMP_ID]
+
+    if raw[const.CSV_RATE_AREA_ID].strip():
+        attr[const.RATE_FAM_AREA_ID] = utils.get_num_int(raw[const.CSV_RATE_AREA_ID])
+
+    if raw[const.CSV_RATE_INDI_RATE].strip():
+        attr[const.RATE_FAM_INDI_RATE] = raw[const.CSV_RATE_INDI_RATE]
+
+    if raw[const.CSV_RATE_COUPLE]:
+        family_type = Enum.family_type[const.CSV_RATE_COUPLE]
+        attr[const.RATE_FAM_TYPE] = family_type
+        attr[const.RATE_FAM_RATE] = raw[const.CSV_RATE_COUPLE]
+        save_data(const.TABLE_RATE_FAMILY, attr)
+
+    if raw[const.CSV_RATE_PRIM_ONE_DEPENDENT]:
+        family_type = Enum.family_type[const.CSV_RATE_PRIM_ONE_DEPENDENT]
+        attr[const.RATE_FAM_TYPE] = family_type
+        attr[const.RATE_FAM_RATE] = raw[const.CSV_RATE_PRIM_ONE_DEPENDENT]
+        save_data(const.TABLE_RATE_FAMILY, attr)
+
+    if raw[const.CSV_RATE_PRIM_TWO_DEPENDENT]:
+        family_type = Enum.family_type[const.CSV_RATE_PRIM_TWO_DEPENDENT]
+        attr[const.RATE_FAM_TYPE] = family_type
+        attr[const.RATE_FAM_RATE] = raw[const.CSV_RATE_PRIM_TWO_DEPENDENT]
+        save_data(const.TABLE_RATE_FAMILY, attr)
+
+    if raw[const.CSV_RATE_PRIM_THREE_DEPENDENT]:
+        family_type = Enum.family_type[const.CSV_RATE_PRIM_THREE_DEPENDENT]
+        attr[const.RATE_FAM_TYPE] = family_type
+        attr[const.RATE_FAM_RATE] = raw[const.CSV_RATE_PRIM_THREE_DEPENDENT]
+        save_data(const.TABLE_RATE_FAMILY, attr)
+
+    if raw[const.CSV_RATE_COUPLE_ONE_DEPENDENT]:
+        family_type = Enum.family_type[const.CSV_RATE_COUPLE_ONE_DEPENDENT]
+        attr[const.RATE_FAM_TYPE] = family_type
+        attr[const.RATE_FAM_RATE] = raw[const.CSV_RATE_COUPLE_ONE_DEPENDENT]
+        save_data(const.TABLE_RATE_FAMILY, attr)
+
+    if raw[const.CSV_RATE_COUPLE_TWO_DEPENDENT]:
+        family_type = Enum.family_type[const.CSV_RATE_COUPLE_TWO_DEPENDENT]
+        attr[const.RATE_FAM_TYPE] = family_type
+        attr[const.RATE_FAM_RATE] = raw[const.CSV_RATE_COUPLE_TWO_DEPENDENT]
+        save_data(const.TABLE_RATE_FAMILY, attr)
+
+    if raw[const.CSV_RATE_COUPLE_THREE_DEPENDENT]:
+        family_type = Enum.family_type[const.CSV_RATE_COUPLE_THREE_DEPENDENT]
+        attr[const.RATE_FAM_TYPE] = family_type
+        attr[const.RATE_FAM_RATE] = raw[const.CSV_RATE_COUPLE_THREE_DEPENDENT]
+        save_data(const.TABLE_RATE_FAMILY, attr)
 
 
 if __name__ == '__main__':
@@ -706,4 +991,9 @@ if __name__ == '__main__':
 
     # Load Plan_Attributes_PUF.csv
     load_plans()
-    conn.commit()
+
+    # Load Benefits_Cost_Sharing_PUF.csv
+    load_benefits()
+
+    # Load Rate
+    load_rate()

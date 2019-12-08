@@ -33,8 +33,8 @@ CREATE TABLE plan_type
 ALTER TABLE plan_type
     OWNER TO manager;
 
--- On Exchange
--- Off Exchange
+-- On the Exchange
+-- Off the Exchange
 -- Both
 CREATE TABLE qhp_type
 (
@@ -61,23 +61,11 @@ ALTER TABLE child_only_offering_type
     OWNER TO manager;
 
 
--- HIOS
--- SERFF
--- OPM
-CREATE TABLE source_name_type
-(
-    id        INT,
-    type_name VARCHAR(7),
-    primary key (id)
-);
-
-ALTER TABLE source_name_type
-    OWNER TO manager;
-
 -- Platinum
 -- Gold
 -- Silver
 -- Bronze
+-- Expanded Bronze
 -- Catastrophic
 CREATE TABLE medical_metal_level_type
 (
@@ -100,30 +88,6 @@ CREATE TABLE dental_metal_level_type
 
 ALTER TABLE dental_metal_level_type
     OWNER TO manager;
-
--- No Preference
--- Tobacco User/Non-Tobacco User
-CREATE TABLE tobacco_type
-(
-    id        INT,
-    type_name VARCHAR(31),
-    primary key (id)
-);
-
-ALTER TABLE tobacco_type
-    OWNER TO manager;
-
-CREATE TABLE age_type
-(
-    id      INT,
-    minimum INT,
-    maximum INT,
-    primary key (id)
-);
-
-ALTER TABLE age_type
-    OWNER TO manager;
-
 
 -- Couple
 -- PrimarySubscriberAndOneDependent
@@ -172,47 +136,14 @@ ALTER TABLE copay_type
 -- X%
 -- X% Coinsurance after deductible
 -- Not Applicable
-CREATE TABLE coin_type
+CREATE TABLE coins_type
 (
     id        INT,
     type_name VARCHAR(63),
     primary key (id)
 );
 
-ALTER TABLE coin_type
-    OWNER TO manager;
-
--- Hours per week
--- Hours per month
--- Hours per year
--- Days per week
--- Days per month
--- Days per year
--- Months per year
--- Visits per week
--- Visits per month
--- Visits per year
--- Lifetime visits
--- Treatments per week
--- Treatments per month
--- Lifetime treatments
--- Lifetime admissions
--- Procedures per week
--- Procedures per month
--- Procedures per year
--- Lifetime procedures
--- Dollars per year
--- Dollars per visit
--- Days per admission
--- Procedures per episode
-CREATE TABLE limit_unit_type
-(
-    id        INT,
-    type_name VARCHAR(31),
-    primary key (id)
-);
-
-ALTER TABLE limit_unit_type
+ALTER TABLE coins_type
     OWNER TO manager;
 
 -- Design Type 1
@@ -232,17 +163,6 @@ ALTER TABLE design_type
     OWNER TO manager;
 
 /* -------------------------Plan Attributes Data Set--------------------------- */
-
-CREATE TABLE issuer
-(
-    issuer_id CHAR(5),
-    tin       CHAR(10),
-    PRIMARY KEY (issuer_id)
-);
-
-ALTER TABLE issuer
-    OWNER TO manager;
-
 CREATE TABLE plans
 (
     plan_id                           CHAR(17),
@@ -251,7 +171,7 @@ CREATE TABLE plans
     plan_marketing_name               VARCHAR(127),
     year                              CHAR(4),
     state                             CHAR(2),
-    source_name                       INT REFERENCES source_name_type (id),
+    source_name                       VARCHAR(15),
     import_date                       TIMESTAMP,
     hios_product_id                   CHAR(10),
     hpid                              CHAR(10),
@@ -270,17 +190,23 @@ CREATE TABLE plans
     out_of_service_area_coverage      BOOLEAN,
     out_of_service_area_coverage_desc TEXT,
     plan_level_exclusions             TEXT,
---     est_advanced_payment_for_indian_plan DECIMAL(5, 2),
-    csr_variant_type                  INT,
-    multiple_in_network_tiers         BOOLEAN,
-    first_tier_utilization            DECIMAL(5, 2),
-    second_tier_utilization           DECIMAL(5, 2),
     effective_date                    DATE,
     expiration_date                   DATE,
     PRIMARY KEY (plan_id)
 );
 
 ALTER TABLE plans
+    OWNER TO manager;
+
+CREATE TABLE plan_multi_network
+(
+    plan_id                 CHAR(17) REFERENCES plans (plan_id),
+    first_tier_utilization  DECIMAL(5, 2),
+    second_tier_utilization DECIMAL(5, 2),
+    PRIMARY KEY (plan_id)
+);
+
+ALTER TABLE plan_multi_network
     OWNER TO manager;
 
 CREATE TABLE medical_plans
@@ -299,7 +225,7 @@ ALTER TABLE medical_plans
 
 CREATE TABLE medical_plan_referral
 (
-    plan_id             CHAR(17) REFERENCES plans (plan_id),
+    plan_id             CHAR(17) REFERENCES medical_plans (plan_id),
     specialist_referral TEXT,
     PRIMARY KEY (plan_id)
 );
@@ -307,18 +233,9 @@ CREATE TABLE medical_plan_referral
 ALTER TABLE medical_plan_referral
     OWNER TO manager;
 
-CREATE TABLE medical_plan_disease
-(
-    plan_id CHAR(17) REFERENCES medical_plans (plan_id),
-    disease VARCHAR(31)
-);
-
-ALTER TABLE medical_plan_disease
-    OWNER TO manager;
-
 CREATE TABLE medical_plan_sbc
 (
-    plan_id                            CHAR(17) REFERENCES plans (plan_id),
+    plan_id                            CHAR(17) REFERENCES medical_plans (plan_id),
     having_baby_deductible             INT,
     having_baby_copayment              INT,
     having_baby_coinsurance            INT,
@@ -467,7 +384,7 @@ ALTER TABLE dental_plans
 
 CREATE TABLE dental_plan_moop
 (
-    plan_id                        CHAR(17) REFERENCES plans (plan_id),
+    plan_id                        CHAR(17) REFERENCES dental_plans (plan_id),
     inn_tier1_individual           INT,
     inn_tier1_family_per_person    INT,
     inn_tier1_family_per_group     INT,
@@ -488,7 +405,7 @@ ALTER TABLE dental_plan_moop
 
 CREATE TABLE dental_plan_ded
 (
-    plan_id                        CHAR(17) REFERENCES plans (plan_id),
+    plan_id                        CHAR(17) REFERENCES dental_plans (plan_id),
     inn_tier1_individual           INT,
     inn_tier1_family_per_person    INT,
     inn_tier1_family_per_group     INT,
@@ -509,35 +426,27 @@ ALTER TABLE dental_plan_ded
 
 /* -------------------------Benefits Data Set--------------------------- */
 
-CREATE TABLE benefits
-(
-    id   INT PRIMARY KEY,
-    name VARCHAR(31)
-);
-
-ALTER TABLE benefits
-    OWNER TO manager;
-
 CREATE TABLE plan_benefit
 (
-    plan_id               CHAR(17),
-    benefit_id            INT REFERENCES benefits (id),
-    copay_inn_tier1       NUMERIC(5, 2),
+    plan_id               CHAR(17) REFERENCES plans (plan_id),
+    benefit_name          VARCHAR(127),
+    copay_inn_tier1       DECIMAL,
     copay_inn_tier1_type  INT REFERENCES copay_type (id),
-    copay_inn_tier2       NUMERIC(5, 2),
+    copay_inn_tier2       DECIMAL,
     copay_inn_tier2_type  INT REFERENCES copay_type (id),
-    copay_oon             NUMERIC(5, 2),
+    copay_oon             DECIMAL,
     copay_oon_type        INT REFERENCES copay_type (id),
-    coins_inn_tier1       NUMERIC(5, 2),
-    coins_inn_tier1_type  INT REFERENCES coin_type (id),
-    coins_inn_tier2       NUMERIC(5, 2),
-    coins_inn_tier2_type  INT REFERENCES coin_type (id),
-    coins_oon             NUMERIC(5, 2),
-    coins_oon_type        INT REFERENCES coin_type (id),
+    coins_inn_tier1       DECIMAL(5, 2),
+    coins_inn_tier1_type  INT REFERENCES coins_type (id),
+    coins_inn_tier2       DECIMAL(5, 2),
+    coins_inn_tier2_type  INT REFERENCES coins_type (id),
+    coins_oon             DECIMAL(5, 2),
+    coins_oon_type        INT REFERENCES coins_type (id),
     is_ehb                BOOLEAN,
-    is_excl_from_inn_mood BOOLEAN,
-    is_excl_from_oon_mood BOOLEAN,
-    PRIMARY KEY (plan_id, benefit_id)
+    is_excl_from_inn_moop BOOLEAN,
+    is_excl_from_oon_moop BOOLEAN,
+    exclusions            TEXT,
+    PRIMARY KEY (plan_id, benefit_name)
 );
 
 ALTER TABLE plan_benefit
@@ -545,14 +454,13 @@ ALTER TABLE plan_benefit
 
 CREATE TABLE plan_benefit_limitation
 (
-    plan_id     CHAR(17),
-    benefit_id  INT,
-    limit_qty   INT,
-    limit_unit  INT,
-    exclusions  VARCHAR(255),
-    explanation VARCHAR(255),
-    PRIMARY KEY (plan_id, benefit_id),
-    FOREIGN KEY (plan_id, benefit_id) REFERENCES plan_benefit (plan_id, benefit_id)
+    plan_id      CHAR(17),
+    benefit_name VARCHAR(127),
+    limit_qty    INT,
+    limit_unit   VARCHAR(127),
+    explanation  TEXT,
+    PRIMARY KEY (plan_id, benefit_name),
+    FOREIGN KEY (plan_id, benefit_name) REFERENCES plan_benefit (plan_id, benefit_name)
 );
 
 ALTER TABLE plan_benefit_limitation
@@ -567,11 +475,12 @@ CREATE TABLE rate_individual
     expiration_date         DATE,
     std_component_id        CHAR(14),
     rating_area_id          INT,
-    tobacco                 INT,
-    age                     INT,
-    individual_rate         NUMERIC(6, 2),
-    individual_tobacco_rate NUMERIC(6, 2),
-    PRIMARY KEY (effective_date, expiration_date, std_component_id, rating_area_id, age)
+    tobacco                 BOOLEAN,
+    age_range_from          INT,
+    age_range_to            INT,
+    individual_rate         DECIMAL(6, 2),
+    individual_tobacco_rate DECIMAL(6, 2),
+    PRIMARY KEY (effective_date, expiration_date, std_component_id, rating_area_id, age_range_from, age_range_to)
 );
 
 ALTER TABLE rate_individual
@@ -586,7 +495,7 @@ CREATE TABLE rate_family
     individual       NUMERIC(6, 2),
     family_type      INT,
     family_rate      NUMERIC(6, 2),
-    PRIMARY KEY (effective_date, expiration_date, std_component_id, rating_area_id)
+    PRIMARY KEY (effective_date, expiration_date, std_component_id, rating_area_id, family_type)
 );
 
 ALTER TABLE rate_family
@@ -598,6 +507,7 @@ INSERT INTO market_coverage_type
 VALUES (1, 'Individual');
 INSERT INTO market_coverage_type
 VALUES (2, 'SHOP (Small Group)');
+
 INSERT INTO plan_type
 VALUES (1, 'Indemnity');
 INSERT INTO plan_type
@@ -608,24 +518,21 @@ INSERT INTO plan_type
 VALUES (4, 'POS');
 INSERT INTO plan_type
 VALUES (5, 'EPO');
+
 INSERT INTO qhp_type
 VALUES (1, 'On the Exchange');
 INSERT INTO qhp_type
 VALUES (2, 'Off the Exchange');
 INSERT INTO qhp_type
 VALUES (3, 'Both');
+
 INSERT INTO child_only_offering_type
 VALUES (1, 'Allows Adult and Child-Only');
 INSERT INTO child_only_offering_type
 VALUES (2, 'Allows Adult-Only');
 INSERT INTO child_only_offering_type
 VALUES (3, 'Allows Child-Only');
-INSERT INTO source_name_type
-VALUES (1, 'HIOS');
-INSERT INTO source_name_type
-VALUES (2, 'SERFF');
-INSERT INTO source_name_type
-VALUES (3, 'OPM');
+
 INSERT INTO medical_metal_level_type
 VALUES (1, 'Platinum');
 INSERT INTO medical_metal_level_type
@@ -643,112 +550,7 @@ INSERT INTO dental_metal_level_type
 VALUES (1, 'High');
 INSERT INTO dental_metal_level_type
 VALUES (2, 'Low');
-INSERT INTO tobacco_type
-VALUES (1, 'No Preference');
-INSERT INTO tobacco_type
-VALUES (2, 'Tobacco User/Non-Tobacco User');
-INSERT INTO age_type
-VALUES (1, 0, 14);
-INSERT INTO age_type
-VALUES (2, 15, 15);
-INSERT INTO age_type
-VALUES (3, 16, 16);
-INSERT INTO age_type
-VALUES (4, 17, 17);
-INSERT INTO age_type
-VALUES (5, 18, 18);
-INSERT INTO age_type
-VALUES (6, 19, 19);
-INSERT INTO age_type
-VALUES (7, 20, 20);
-INSERT INTO age_type
-VALUES (8, 21, 21);
-INSERT INTO age_type
-VALUES (9, 22, 22);
-INSERT INTO age_type
-VALUES (10, 23, 23);
-INSERT INTO age_type
-VALUES (11, 24, 24);
-INSERT INTO age_type
-VALUES (12, 25, 25);
-INSERT INTO age_type
-VALUES (21, 26, 26);
-INSERT INTO age_type
-VALUES (22, 27, 27);
-INSERT INTO age_type
-VALUES (23, 28, 28);
-INSERT INTO age_type
-VALUES (24, 29, 29);
-INSERT INTO age_type
-VALUES (25, 30, 30);
-INSERT INTO age_type
-VALUES (26, 31, 31);
-INSERT INTO age_type
-VALUES (27, 32, 32);
-INSERT INTO age_type
-VALUES (28, 33, 33);
-INSERT INTO age_type
-VALUES (29, 34, 34);
-INSERT INTO age_type
-VALUES (30, 35, 35);
-INSERT INTO age_type
-VALUES (31, 36, 36);
-INSERT INTO age_type
-VALUES (32, 37, 37);
-INSERT INTO age_type
-VALUES (33, 38, 38);
-INSERT INTO age_type
-VALUES (34, 39, 39);
-INSERT INTO age_type
-VALUES (35, 40, 40);
-INSERT INTO age_type
-VALUES (36, 41, 41);
-INSERT INTO age_type
-VALUES (37, 42, 42);
-INSERT INTO age_type
-VALUES (38, 43, 43);
-INSERT INTO age_type
-VALUES (39, 44, 44);
-INSERT INTO age_type
-VALUES (40, 45, 45);
-INSERT INTO age_type
-VALUES (41, 46, 46);
-INSERT INTO age_type
-VALUES (42, 47, 47);
-INSERT INTO age_type
-VALUES (43, 48, 48);
-INSERT INTO age_type
-VALUES (44, 49, 49);
-INSERT INTO age_type
-VALUES (45, 50, 50);
-INSERT INTO age_type
-VALUES (46, 51, 51);
-INSERT INTO age_type
-VALUES (47, 52, 52);
-INSERT INTO age_type
-VALUES (48, 53, 53);
-INSERT INTO age_type
-VALUES (49, 54, 54);
-INSERT INTO age_type
-VALUES (50, 55, 55);
-INSERT INTO age_type
-VALUES (51, 56, 56);
-INSERT INTO age_type
-VALUES (52, 57, 57);
-INSERT INTO age_type
-VALUES (53, 58, 58);
-INSERT INTO age_type
-VALUES (54, 59, 59);
-INSERT INTO age_type
-VALUES (55, 60, 60);
-INSERT INTO age_type
-VALUES (56, 61, 61);
-INSERT INTO age_type
-VALUES (57, 62, 62);
-INSERT INTO age_type
-VALUES (58, 63, 63);
-INSERT INTO age_type
-VALUES (59, 64, 127);
+
 INSERT INTO family_type
 VALUES (1, 'Couple');
 INSERT INTO family_type
@@ -763,6 +565,7 @@ INSERT INTO family_type
 VALUES (6, 'CoupleAndTwoDependents');
 INSERT INTO family_type
 VALUES (7, 'CoupleAndThreeOrMoreDependents');
+
 INSERT INTO copay_type
 VALUES (1, 'No Charge');
 INSERT INTO copay_type
@@ -793,64 +596,18 @@ INSERT INTO copay_type
 VALUES (14, 'Copay per Stay with deductible');
 INSERT INTO copay_type
 VALUES (15, 'Not Applicable');
-INSERT INTO coin_type
+
+INSERT INTO coins_type
 VALUES (1, 'No Charge');
-INSERT INTO coin_type
+INSERT INTO coins_type
 VALUES (2, 'No Charge after deductible');
-INSERT INTO coin_type
-VALUES (3, '%');
-INSERT INTO coin_type
-VALUES (4, '% Coinsurance after deductible');
-INSERT INTO coin_type
+INSERT INTO coins_type
+VALUES (3, 'Coinsurance');
+INSERT INTO coins_type
+VALUES (4, 'Coinsurance after deductible');
+INSERT INTO coins_type
 VALUES (5, 'Not Applicable');
-INSERT INTO limit_unit_type
-VALUES (1, 'Hours per week');
-INSERT INTO limit_unit_type
-VALUES (2, 'Hours per month');
-INSERT INTO limit_unit_type
-VALUES (3, 'Hours per year');
-INSERT INTO limit_unit_type
-VALUES (4, 'Days per week');
-INSERT INTO limit_unit_type
-VALUES (5, 'Days per month');
-INSERT INTO limit_unit_type
-VALUES (6, 'Days per year');
-INSERT INTO limit_unit_type
-VALUES (7, 'Months per year');
-INSERT INTO limit_unit_type
-VALUES (8, 'Months per year');
-INSERT INTO limit_unit_type
-VALUES (9, 'Visits per week');
-INSERT INTO limit_unit_type
-VALUES (10, 'Visits per month');
-INSERT INTO limit_unit_type
-VALUES (11, 'Visits per year');
-INSERT INTO limit_unit_type
-VALUES (12, 'Lifetime visits');
-INSERT INTO limit_unit_type
-VALUES (13, 'Treatments per week');
-INSERT INTO limit_unit_type
-VALUES (14, 'Treatments per month');
-INSERT INTO limit_unit_type
-VALUES (15, 'Lifetime treatments');
-INSERT INTO limit_unit_type
-VALUES (16, 'Lifetime admissions');
-INSERT INTO limit_unit_type
-VALUES (17, 'Procedures per week');
-INSERT INTO limit_unit_type
-VALUES (18, 'Procedures per month');
-INSERT INTO limit_unit_type
-VALUES (19, 'Procedures per year');
-INSERT INTO limit_unit_type
-VALUES (20, 'Lifetime procedures');
-INSERT INTO limit_unit_type
-VALUES (21, 'Dollars per year');
-INSERT INTO limit_unit_type
-VALUES (22, 'Dollars per visit');
-INSERT INTO limit_unit_type
-VALUES (23, 'Days per admission');
-INSERT INTO limit_unit_type
-VALUES (24, 'Procedures per episode');
+
 INSERT INTO design_type
 VALUES (1, 'Design Type 1');
 INSERT INTO design_type

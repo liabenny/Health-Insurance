@@ -174,9 +174,10 @@ def input_processing():
 
 
 def main():
-    print("Welcome to Healthcare Insurance Database System!\n")
+    print("Welcome to Healthcare Insurance Database System!")
+    print("Data Source: The Centers for Medicare & Medicaid Services(CMS)\n")
     while True:
-        print("======Initializing new search======\n")
+        print("======Initializing new search======")
         db.Query(input_processing()).run_query()
 
 

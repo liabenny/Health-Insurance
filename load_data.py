@@ -12,6 +12,7 @@ from psycopg2.extensions import AsIs
 file_plan = "2020-dataset/Plan_Attributes_PUF.csv"
 file_benefits = "2020-dataset/Benefits_Cost_Sharing_PUF.csv"
 file_rate = "2020-dataset/Rate_PUF.csv"
+file_business_rules = "2020-dataset/Business_Rules_PUF.csv"
 
 
 def save_data(table, attributes):
@@ -90,44 +91,44 @@ def load_plans():
 def add_plan_general_info(raw):
     attr = dict()
 
-    if raw[const.CSV_PLAN_ID].strip():
+    if raw[const.CSV_PLAN_ID]:
         attr[const.PLAN_ID] = raw[const.CSV_PLAN_ID]
 
-    if raw[const.CSV_PLAN_VAR_NAME].strip():
+    if raw[const.CSV_PLAN_VAR_NAME]:
         attr[const.PLAN_VAR_NAME] = raw[const.CSV_PLAN_VAR_NAME]
 
-    if raw[const.CSV_PLAN_MARK_NAME].strip():
+    if raw[const.CSV_PLAN_MARK_NAME]:
         attr[const.PLAN_MARK_NAME] = raw[const.CSV_PLAN_MARK_NAME]
 
-    if raw[const.CSV_STD_COMP_ID].strip():
+    if raw[const.CSV_STD_COMP_ID]:
         attr[const.STD_COMP_ID] = raw[const.CSV_STD_COMP_ID]
 
-    if raw[const.CSV_PLAN_YEAR].strip():
+    if raw[const.CSV_PLAN_YEAR]:
         attr[const.PLAN_YEAR] = raw[const.CSV_PLAN_YEAR]
 
-    if raw[const.CSV_PLAN_STATE].strip():
+    if raw[const.CSV_PLAN_STATE]:
         attr[const.PLAN_STATE] = raw[const.CSV_PLAN_STATE]
 
-    if raw[const.CSV_SOURCE_NAME].strip():
+    if raw[const.CSV_SOURCE_NAME]:
         attr[const.SOURCE_NAME] = raw[const.CSV_SOURCE_NAME]
 
-    if raw[const.CSV_IMPORT_DATE].strip():
+    if raw[const.CSV_IMPORT_DATE]:
         ts = datetime.strptime(raw[const.CSV_IMPORT_DATE], "%m/%d/%Y %H:%M")
         attr[const.IMPORT_DATE] = ts.strftime("%Y-%m-%d %H:%M:%S")
 
-    if raw[const.CSV_HIOS_PROD_ID].strip():
+    if raw[const.CSV_HIOS_PROD_ID]:
         attr[const.HIOS_PROD_ID] = raw[const.CSV_HIOS_PROD_ID]
 
-    if raw[const.CSV_HPID].strip():
+    if raw[const.CSV_HPID]:
         attr[const.HPID] = raw[const.CSV_HPID]
 
-    if raw[const.CSV_NETWORK_ID].strip():
+    if raw[const.CSV_NETWORK_ID]:
         attr[const.NETWORK_ID] = raw[const.CSV_NETWORK_ID]
 
-    if raw[const.CSV_SERV_AREA_ID].strip():
+    if raw[const.CSV_SERV_AREA_ID]:
         attr[const.SERV_AREA_ID] = raw[const.CSV_SERV_AREA_ID]
 
-    if raw[const.CSV_FORMULARY_ID].strip():
+    if raw[const.CSV_FORMULARY_ID]:
         attr[const.FORMULARY_ID] = raw[const.CSV_FORMULARY_ID]
 
     if raw[const.CSV_IS_NEW_PLAN] == 'New':
@@ -175,7 +176,7 @@ def add_plan_general_info(raw):
     else:
         attr[const.OUT_COUNTRY_COV] = False
 
-    if raw[const.CSV_OUT_COUNTRY_COV_DESC].strip():
+    if raw[const.CSV_OUT_COUNTRY_COV_DESC]:
         attr[const.OUT_COUNTRY_COV_DESC] = raw[const.CSV_OUT_COUNTRY_COV_DESC]
 
     if raw[const.CSV_OUT_SERV_AREA_COV] == 'Yes':
@@ -183,16 +184,16 @@ def add_plan_general_info(raw):
     else:
         attr[const.OUT_SERV_AREA_COV] = False
 
-    if raw[const.CSV_OUT_SERV_AREA_COV_DESC].strip():
+    if raw[const.CSV_OUT_SERV_AREA_COV_DESC]:
         attr[const.OUT_SERV_AREA_COV_DESC] = raw[const.CSV_OUT_SERV_AREA_COV_DESC]
 
-    if raw[const.CSV_PLAN_EXCLUSIONS].strip():
+    if raw[const.CSV_PLAN_EXCLUSIONS]:
         attr[const.PLAN_EXCLUSIONS] = raw[const.CSV_PLAN_EXCLUSIONS]
 
-    if raw[const.CSV_EFFECTIVE_DATE].strip():
+    if raw[const.CSV_EFFECTIVE_DATE]:
         attr[const.EFFECTIVE_DATE] = raw[const.CSV_EFFECTIVE_DATE]
 
-    if raw[const.CSV_EXPIRATION_DATE].strip():
+    if raw[const.CSV_EXPIRATION_DATE]:
         attr[const.EXPIRATION_DATE] = raw[const.CSV_EXPIRATION_DATE]
 
     save_data(const.TABLE_PLAN, attr)
@@ -203,13 +204,13 @@ def add_plan_general_info(raw):
 def add_plan_multi_network(raw):
     attr = dict()
 
-    if raw[const.CSV_PLAN_ID].strip():
+    if raw[const.CSV_PLAN_ID]:
         attr[const.PLAN_ID] = raw[const.CSV_PLAN_ID]
 
-    if raw[const.CSV_FIRST_TIER_UTIL].strip():
+    if raw[const.CSV_FIRST_TIER_UTIL]:
         attr[const.FIRST_TIER_UTIL] = raw[const.CSV_FIRST_TIER_UTIL].rstrip("%")
 
-    if raw[const.CSV_SECOND_TIER_UTIL].strip():
+    if raw[const.CSV_SECOND_TIER_UTIL]:
         attr[const.SECOND_TIER_UTIL] = raw[const.CSV_SECOND_TIER_UTIL].rstrip("%")
 
     save_data(const.TABLE_PLAN_MULTI_NET, attr)
@@ -218,7 +219,7 @@ def add_plan_multi_network(raw):
 def add_dental_plan(raw):
     attr = dict()
 
-    if raw[const.CSV_PLAN_ID].strip():
+    if raw[const.CSV_PLAN_ID]:
         attr[const.PLAN_ID] = raw[const.CSV_PLAN_ID]
 
     if raw[const.CSV_METAL_LEVEL] in Enum.d_metal_type:
@@ -226,7 +227,7 @@ def add_dental_plan(raw):
     else:
         return False
 
-    if raw[const.CSV_EHB_PEDIATRIC_QTY].strip():
+    if raw[const.CSV_EHB_PEDIATRIC_QTY]:
         attr[const.EHB_PEDIATRIC_QTY] = raw[const.CSV_EHB_PEDIATRIC_QTY]
 
     if raw[const.CSV_GUARANTEED_RATE] == 'Yes':
@@ -244,43 +245,43 @@ def add_dental_plan(raw):
 def add_dental_plan_moop(raw):
     attr = dict()
 
-    if raw[const.CSV_PLAN_ID].strip():
+    if raw[const.CSV_PLAN_ID]:
         attr[const.PLAN_ID] = raw[const.CSV_PLAN_ID]
 
-    if raw[const.CSV_MEHB_INN_TIER1_INDIVIDUAL_MOOP].strip():
+    if raw[const.CSV_MEHB_INN_TIER1_INDIVIDUAL_MOOP]:
         attr[const.INN_TIER1_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER1_INDIVIDUAL_MOOP])
 
-    if raw[const.CSV_MEHB_INN_TIER1_FAM_PERSON_MOOP].strip():
+    if raw[const.CSV_MEHB_INN_TIER1_FAM_PERSON_MOOP]:
         attr[const.INN_TIER1_FAM_PERSON] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER1_FAM_PERSON_MOOP])
 
-    if raw[const.CSV_MEHB_INN_TIER1_FAM_GROUP_MOOP].strip():
+    if raw[const.CSV_MEHB_INN_TIER1_FAM_GROUP_MOOP]:
         attr[const.INN_TIER1_FAM_GROUP] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER1_FAM_GROUP_MOOP])
 
-    if raw[const.CSV_MEHB_INN_TIER2_INDIVIDUAL_MOOP].strip():
+    if raw[const.CSV_MEHB_INN_TIER2_INDIVIDUAL_MOOP]:
         attr[const.INN_TIER2_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER2_INDIVIDUAL_MOOP])
 
-    if raw[const.CSV_MEHB_INN_TIER2_FAM_PERSON_MOOP].strip():
+    if raw[const.CSV_MEHB_INN_TIER2_FAM_PERSON_MOOP]:
         attr[const.INN_TIER2_FAM_PERSON] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER2_FAM_PERSON_MOOP])
 
-    if raw[const.CSV_MEHB_INN_TIER2_FAM_GROUP_MOOP].strip():
+    if raw[const.CSV_MEHB_INN_TIER2_FAM_GROUP_MOOP]:
         attr[const.INN_TIER2_FAM_GROUP] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER2_FAM_GROUP_MOOP])
 
-    if raw[const.CSV_MEHB_OON_INDIVIDUAL_MOOP].strip():
+    if raw[const.CSV_MEHB_OON_INDIVIDUAL_MOOP]:
         attr[const.OON_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_MEHB_OON_INDIVIDUAL_MOOP])
 
-    if raw[const.CSV_MEHB_OON_FAM_PERSON_MOOP].strip():
+    if raw[const.CSV_MEHB_OON_FAM_PERSON_MOOP]:
         attr[const.OON_FAM_PERSON] = utils.get_num_int(raw[const.CSV_MEHB_OON_FAM_PERSON_MOOP])
 
-    if raw[const.CSV_MEHB_OON_FAM_GROUP_MOOP].strip():
+    if raw[const.CSV_MEHB_OON_FAM_GROUP_MOOP]:
         attr[const.OON_FAM_GROUP] = utils.get_num_int(raw[const.CSV_MEHB_OON_FAM_GROUP_MOOP])
 
-    if raw[const.CSV_MEHB_COMB_INDIVIDUAL_MOOP].strip():
+    if raw[const.CSV_MEHB_COMB_INDIVIDUAL_MOOP]:
         attr[const.COMB_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_MEHB_COMB_INDIVIDUAL_MOOP])
 
-    if raw[const.CSV_MEHB_COMB_FAM_PERSON_MOOP].strip():
+    if raw[const.CSV_MEHB_COMB_FAM_PERSON_MOOP]:
         attr[const.COMB_FAM_PERSON] = utils.get_num_int(raw[const.CSV_MEHB_COMB_FAM_PERSON_MOOP])
 
-    if raw[const.CSV_MEHB_COMB_FAM_GROUP_MOOP].strip():
+    if raw[const.CSV_MEHB_COMB_FAM_GROUP_MOOP]:
         attr[const.COMB_FAM_GROUP] = utils.get_num_int(raw[const.CSV_MEHB_COMB_FAM_GROUP_MOOP])
 
     save_data(const.TABLE_D_PLAN_MOOP, attr)
@@ -289,43 +290,43 @@ def add_dental_plan_moop(raw):
 def add_dental_plan_ded(raw):
     attr = dict()
 
-    if raw[const.CSV_PLAN_ID].strip():
+    if raw[const.CSV_PLAN_ID]:
         attr[const.PLAN_ID] = raw[const.CSV_PLAN_ID]
 
-    if raw[const.CSV_MEHB_INN_TIER1_INDIVIDUAL_DED].strip():
+    if raw[const.CSV_MEHB_INN_TIER1_INDIVIDUAL_DED]:
         attr[const.INN_TIER1_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER1_INDIVIDUAL_DED])
 
-    if raw[const.CSV_MEHB_INN_TIER1_FAM_PERSON_DED].strip():
+    if raw[const.CSV_MEHB_INN_TIER1_FAM_PERSON_DED]:
         attr[const.INN_TIER1_FAM_PERSON] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER1_FAM_PERSON_DED])
 
-    if raw[const.CSV_MEHB_INN_TIER1_FAM_GROUP_DED].strip():
+    if raw[const.CSV_MEHB_INN_TIER1_FAM_GROUP_DED]:
         attr[const.INN_TIER1_FAM_GROUP] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER1_FAM_GROUP_DED])
 
-    if raw[const.CSV_MEHB_INN_TIER2_INDIVIDUAL_DED].strip():
+    if raw[const.CSV_MEHB_INN_TIER2_INDIVIDUAL_DED]:
         attr[const.INN_TIER2_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER2_INDIVIDUAL_DED])
 
-    if raw[const.CSV_MEHB_INN_TIER2_FAM_PERSON_DED].strip():
+    if raw[const.CSV_MEHB_INN_TIER2_FAM_PERSON_DED]:
         attr[const.INN_TIER2_FAM_PERSON] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER2_FAM_PERSON_DED])
 
-    if raw[const.CSV_MEHB_INN_TIER2_FAM_GROUP_DED].strip():
+    if raw[const.CSV_MEHB_INN_TIER2_FAM_GROUP_DED]:
         attr[const.INN_TIER2_FAM_GROUP] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER2_FAM_GROUP_DED])
 
-    if raw[const.CSV_MEHB_OON_INDIVIDUAL_DED].strip():
+    if raw[const.CSV_MEHB_OON_INDIVIDUAL_DED]:
         attr[const.OON_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_MEHB_OON_INDIVIDUAL_DED])
 
-    if raw[const.CSV_MEHB_OON_FAM_PERSON_DED].strip():
+    if raw[const.CSV_MEHB_OON_FAM_PERSON_DED]:
         attr[const.OON_FAM_PERSON] = utils.get_num_int(raw[const.CSV_MEHB_OON_FAM_PERSON_DED])
 
-    if raw[const.CSV_MEHB_OON_FAM_GROUP_DED].strip():
+    if raw[const.CSV_MEHB_OON_FAM_GROUP_DED]:
         attr[const.OON_FAM_GROUP] = utils.get_num_int(raw[const.CSV_MEHB_OON_FAM_GROUP_DED])
 
-    if raw[const.CSV_MEHB_COMB_INDIVIDUAL_DED].strip():
+    if raw[const.CSV_MEHB_COMB_INDIVIDUAL_DED]:
         attr[const.COMB_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_MEHB_COMB_INDIVIDUAL_DED])
 
-    if raw[const.CSV_MEHB_COMB_FAM_PERSON_DED].strip():
+    if raw[const.CSV_MEHB_COMB_FAM_PERSON_DED]:
         attr[const.COMB_FAM_PERSON] = utils.get_num_int(raw[const.CSV_MEHB_COMB_FAM_PERSON_DED])
 
-    if raw[const.CSV_MEHB_COMB_FAM_GROUP_DED].strip():
+    if raw[const.CSV_MEHB_COMB_FAM_GROUP_DED]:
         attr[const.COMB_FAM_GROUP] = utils.get_num_int(raw[const.CSV_MEHB_COMB_FAM_GROUP_DED])
 
     save_data(const.TABLE_D_PLAN_DED, attr)
@@ -334,7 +335,7 @@ def add_dental_plan_ded(raw):
 def add_medical_plan(raw):
     attr = dict()
 
-    if raw[const.CSV_PLAN_ID].strip():
+    if raw[const.CSV_PLAN_ID]:
         attr[const.PLAN_ID] = raw[const.CSV_PLAN_ID]
 
     if raw[const.CSV_METAL_LEVEL] in Enum.m_metal_type:
@@ -357,7 +358,7 @@ def add_medical_plan(raw):
     else:
         attr[const.UNI_DESIGN] = False
 
-    if raw[const.CSV_EHB_PERCENT].strip():
+    if raw[const.CSV_EHB_PERCENT]:
         attr[const.EHB_PERCENT] = raw[const.CSV_EHB_PERCENT]
 
     # print(medical_plan)
@@ -369,10 +370,10 @@ def add_medical_plan(raw):
 def add_medical_plan_referral(raw):
     attr = dict()
 
-    if raw[const.CSV_PLAN_ID].strip():
+    if raw[const.CSV_PLAN_ID]:
         attr[const.PLAN_ID] = raw[const.CSV_PLAN_ID]
 
-    if raw[const.CSV_REFERRAL].strip():
+    if raw[const.CSV_REFERRAL]:
         attr[const.REFERRAL] = raw[const.CSV_REFERRAL]
 
     # print(attr)
@@ -383,43 +384,43 @@ def add_medical_plan_referral(raw):
 def add_medical_plan_sbc(raw):
     attr = dict()
 
-    if raw[const.CSV_PLAN_ID].strip():
+    if raw[const.CSV_PLAN_ID]:
         attr[const.PLAN_ID] = raw[const.CSV_PLAN_ID]
 
-    if raw[const.CSV_DED_BABY].strip():
+    if raw[const.CSV_DED_BABY]:
         attr[const.DED_BABY] = utils.get_num_int(raw[const.CSV_DED_BABY])
 
-    if raw[const.CSV_COPAY_BABY].strip():
+    if raw[const.CSV_COPAY_BABY]:
         attr[const.COPAY_BABY] = utils.get_num_int(raw[const.CSV_COPAY_BABY])
 
-    if raw[const.CSV_COINS_BABY].strip():
+    if raw[const.CSV_COINS_BABY]:
         attr[const.COINS_BABY] = utils.get_num_int(raw[const.CSV_COINS_BABY])
 
-    if raw[const.CSV_LIMIT_BABY].strip():
+    if raw[const.CSV_LIMIT_BABY]:
         attr[const.LIMIT_BABY] = utils.get_num_int(raw[const.CSV_LIMIT_BABY])
 
-    if raw[const.CSV_DED_DIABETES].strip():
+    if raw[const.CSV_DED_DIABETES]:
         attr[const.DED_DIABETES] = utils.get_num_int(raw[const.CSV_DED_DIABETES])
 
-    if raw[const.CSV_COPAY_DIABETES].strip():
+    if raw[const.CSV_COPAY_DIABETES]:
         attr[const.COPAY_DIABETES] = utils.get_num_int(raw[const.CSV_COPAY_DIABETES])
 
-    if raw[const.CSV_COINS_DIABETES].strip():
+    if raw[const.CSV_COINS_DIABETES]:
         attr[const.COINS_DIABETES] = utils.get_num_int(raw[const.CSV_COINS_DIABETES])
 
-    if raw[const.CSV_LIMIT_DIABETES].strip():
+    if raw[const.CSV_LIMIT_DIABETES]:
         attr[const.LIMIT_DIABETES] = utils.get_num_int(raw[const.CSV_LIMIT_DIABETES])
 
-    if raw[const.CSV_DED_FRACTURE].strip():
+    if raw[const.CSV_DED_FRACTURE]:
         attr[const.DED_FRACTURE] = utils.get_num_int(raw[const.CSV_DED_FRACTURE])
 
-    if raw[const.CSV_COPAY_FRACTURE].strip():
+    if raw[const.CSV_COPAY_FRACTURE]:
         attr[const.COPAY_FRACTURE] = utils.get_num_int(raw[const.CSV_COPAY_FRACTURE])
 
-    if raw[const.CSV_COINS_FRACTURE].strip():
+    if raw[const.CSV_COINS_FRACTURE]:
         attr[const.COINS_FRACTURE] = utils.get_num_int(raw[const.CSV_COINS_FRACTURE])
 
-    if raw[const.CSV_LIMIT_FRACTURE].strip():
+    if raw[const.CSV_LIMIT_FRACTURE]:
         attr[const.LIMIT_FRACTURE] = utils.get_num_int(raw[const.CSV_LIMIT_FRACTURE])
 
     save_data(const.TABLE_M_PLAN_SBC, attr)
@@ -428,79 +429,79 @@ def add_medical_plan_sbc(raw):
 def add_medical_plan_moop(raw):
     attr = dict()
 
-    if raw[const.CSV_PLAN_ID].strip():
+    if raw[const.CSV_PLAN_ID]:
         attr[const.PLAN_ID] = raw[const.CSV_PLAN_ID]
 
-    if raw[const.CSV_MEHB_INN_TIER1_INDIVIDUAL_MOOP].strip():
+    if raw[const.CSV_MEHB_INN_TIER1_INDIVIDUAL_MOOP]:
         attr[const.MEHB_INN_TIER1_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER1_INDIVIDUAL_MOOP])
 
-    if raw[const.CSV_MEHB_INN_TIER1_FAM_PERSON_MOOP].strip():
+    if raw[const.CSV_MEHB_INN_TIER1_FAM_PERSON_MOOP]:
         attr[const.MEHB_INN_TIER1_FAM_PERSON] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER1_FAM_PERSON_MOOP])
 
-    if raw[const.CSV_MEHB_INN_TIER1_FAM_GROUP_MOOP].strip():
+    if raw[const.CSV_MEHB_INN_TIER1_FAM_GROUP_MOOP]:
         attr[const.MEHB_INN_TIER1_FAM_GROUP] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER1_FAM_GROUP_MOOP])
 
-    if raw[const.CSV_MEHB_INN_TIER2_INDIVIDUAL_MOOP].strip():
+    if raw[const.CSV_MEHB_INN_TIER2_INDIVIDUAL_MOOP]:
         attr[const.MEHB_INN_TIER2_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER2_INDIVIDUAL_MOOP])
 
-    if raw[const.CSV_MEHB_INN_TIER2_FAM_PERSON_MOOP].strip():
+    if raw[const.CSV_MEHB_INN_TIER2_FAM_PERSON_MOOP]:
         attr[const.MEHB_INN_TIER2_FAM_PERSON] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER2_FAM_PERSON_MOOP])
 
-    if raw[const.CSV_MEHB_INN_TIER2_FAM_GROUP_MOOP].strip():
+    if raw[const.CSV_MEHB_INN_TIER2_FAM_GROUP_MOOP]:
         attr[const.MEHB_INN_TIER2_FAM_GROUP] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER2_FAM_GROUP_MOOP])
 
-    if raw[const.CSV_MEHB_OON_INDIVIDUAL_MOOP].strip():
+    if raw[const.CSV_MEHB_OON_INDIVIDUAL_MOOP]:
         attr[const.MEHB_OON_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_MEHB_OON_INDIVIDUAL_MOOP])
 
-    if raw[const.CSV_MEHB_OON_FAM_PERSON_MOOP].strip():
+    if raw[const.CSV_MEHB_OON_FAM_PERSON_MOOP]:
         attr[const.MEHB_OON_FAM_PERSON] = utils.get_num_int(raw[const.CSV_MEHB_OON_FAM_PERSON_MOOP])
 
-    if raw[const.CSV_MEHB_OON_FAM_GROUP_MOOP].strip():
+    if raw[const.CSV_MEHB_OON_FAM_GROUP_MOOP]:
         attr[const.MEHB_OON_FAM_GROUP] = utils.get_num_int(raw[const.CSV_MEHB_OON_FAM_GROUP_MOOP])
 
-    if raw[const.CSV_MEHB_COMB_INDIVIDUAL_MOOP].strip():
+    if raw[const.CSV_MEHB_COMB_INDIVIDUAL_MOOP]:
         attr[const.MEHB_COMB_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_MEHB_COMB_INDIVIDUAL_MOOP])
 
-    if raw[const.CSV_MEHB_COMB_FAM_PERSON_MOOP].strip():
+    if raw[const.CSV_MEHB_COMB_FAM_PERSON_MOOP]:
         attr[const.MEHB_COMB_FAM_PERSON] = utils.get_num_int(raw[const.CSV_MEHB_COMB_FAM_PERSON_MOOP])
 
-    if raw[const.CSV_MEHB_COMB_FAM_GROUP_MOOP].strip():
+    if raw[const.CSV_MEHB_COMB_FAM_GROUP_MOOP]:
         attr[const.MEHB_COMB_FAM_GROUP] = utils.get_num_int(raw[const.CSV_MEHB_COMB_FAM_GROUP_MOOP])
 
-    if raw[const.CSV_DEHB_INN_TIER1_INDIVIDUAL_MOOP].strip():
+    if raw[const.CSV_DEHB_INN_TIER1_INDIVIDUAL_MOOP]:
         attr[const.DEHB_INN_TIER1_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_DEHB_INN_TIER1_INDIVIDUAL_MOOP])
 
-    if raw[const.CSV_DEHB_INN_TIER1_FAM_PERSON_MOOP].strip():
+    if raw[const.CSV_DEHB_INN_TIER1_FAM_PERSON_MOOP]:
         attr[const.DEHB_INN_TIER1_FAM_PERSON] = utils.get_num_int(raw[const.CSV_DEHB_INN_TIER1_FAM_PERSON_MOOP])
 
-    if raw[const.CSV_DEHB_INN_TIER1_FAM_GROUP_MOOP].strip():
+    if raw[const.CSV_DEHB_INN_TIER1_FAM_GROUP_MOOP]:
         attr[const.DEHB_INN_TIER1_FAM_GROUP] = utils.get_num_int(raw[const.CSV_DEHB_INN_TIER1_FAM_GROUP_MOOP])
 
-    if raw[const.CSV_DEHB_INN_TIER2_INDIVIDUAL_MOOP].strip():
+    if raw[const.CSV_DEHB_INN_TIER2_INDIVIDUAL_MOOP]:
         attr[const.DEHB_INN_TIER2_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_DEHB_INN_TIER2_INDIVIDUAL_MOOP])
 
-    if raw[const.CSV_DEHB_INN_TIER2_FAM_PERSON_MOOP].strip():
+    if raw[const.CSV_DEHB_INN_TIER2_FAM_PERSON_MOOP]:
         attr[const.DEHB_INN_TIER2_FAM_PERSON] = utils.get_num_int(raw[const.CSV_DEHB_INN_TIER2_FAM_PERSON_MOOP])
 
-    if raw[const.CSV_DEHB_INN_TIER2_FAM_GROUP_MOOP].strip():
+    if raw[const.CSV_DEHB_INN_TIER2_FAM_GROUP_MOOP]:
         attr[const.DEHB_INN_TIER2_FAM_GROUP] = utils.get_num_int(raw[const.CSV_DEHB_INN_TIER2_FAM_GROUP_MOOP])
 
-    if raw[const.CSV_DEHB_OON_INDIVIDUAL_MOOP].strip():
+    if raw[const.CSV_DEHB_OON_INDIVIDUAL_MOOP]:
         attr[const.DEHB_OON_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_DEHB_OON_INDIVIDUAL_MOOP])
 
-    if raw[const.CSV_DEHB_OON_FAM_PERSON_MOOP].strip():
+    if raw[const.CSV_DEHB_OON_FAM_PERSON_MOOP]:
         attr[const.DEHB_OON_FAM_PERSON] = utils.get_num_int(raw[const.CSV_DEHB_OON_FAM_PERSON_MOOP])
 
-    if raw[const.CSV_DEHB_OON_FAM_GROUP_MOOP].strip():
+    if raw[const.CSV_DEHB_OON_FAM_GROUP_MOOP]:
         attr[const.DEHB_OON_FAM_GROUP] = utils.get_num_int(raw[const.CSV_DEHB_OON_FAM_GROUP_MOOP])
 
-    if raw[const.CSV_DEHB_COMB_INDIVIDUAL_MOOP].strip():
+    if raw[const.CSV_DEHB_COMB_INDIVIDUAL_MOOP]:
         attr[const.DEHB_COMB_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_DEHB_COMB_INDIVIDUAL_MOOP])
 
-    if raw[const.CSV_DEHB_COMB_FAM_PERSON_MOOP].strip():
+    if raw[const.CSV_DEHB_COMB_FAM_PERSON_MOOP]:
         attr[const.DEHB_COMB_FAM_PERSON] = utils.get_num_int(raw[const.CSV_DEHB_COMB_FAM_PERSON_MOOP])
 
-    if raw[const.CSV_DEHB_COMB_FAM_GROUP_MOOP].strip():
+    if raw[const.CSV_DEHB_COMB_FAM_GROUP_MOOP]:
         attr[const.DEHB_COMB_FAM_GROUP] = utils.get_num_int(raw[const.CSV_DEHB_COMB_FAM_GROUP_MOOP])
 
     save_data(const.TABLE_M_PLAN_MOOP, attr)
@@ -509,43 +510,43 @@ def add_medical_plan_moop(raw):
 def add_medical_plan_moop_int(raw):
     attr = dict()
 
-    if raw[const.CSV_PLAN_ID].strip():
+    if raw[const.CSV_PLAN_ID]:
         attr[const.PLAN_ID] = raw[const.CSV_PLAN_ID]
 
-    if raw[const.CSV_TEHB_INN_TIER1_INDIVIDUAL_MOOP].strip():
+    if raw[const.CSV_TEHB_INN_TIER1_INDIVIDUAL_MOOP]:
         attr[const.TEHB_INN_TIER1_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_TEHB_INN_TIER1_INDIVIDUAL_MOOP])
 
-    if raw[const.CSV_TEHB_INN_TIER1_FAM_PERSON_MOOP].strip():
+    if raw[const.CSV_TEHB_INN_TIER1_FAM_PERSON_MOOP]:
         attr[const.TEHB_INN_TIER1_FAM_PERSON] = utils.get_num_int(raw[const.CSV_TEHB_INN_TIER1_FAM_PERSON_MOOP])
 
-    if raw[const.CSV_TEHB_INN_TIER1_FAM_GROUP_MOOP].strip():
+    if raw[const.CSV_TEHB_INN_TIER1_FAM_GROUP_MOOP]:
         attr[const.TEHB_INN_TIER1_FAM_GROUP] = utils.get_num_int(raw[const.CSV_TEHB_INN_TIER1_FAM_GROUP_MOOP])
 
-    if raw[const.CSV_TEHB_INN_TIER2_INDIVIDUAL_MOOP].strip():
+    if raw[const.CSV_TEHB_INN_TIER2_INDIVIDUAL_MOOP]:
         attr[const.TEHB_INN_TIER2_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_TEHB_INN_TIER2_INDIVIDUAL_MOOP])
 
-    if raw[const.CSV_TEHB_INN_TIER2_FAM_PERSON_MOOP].strip():
+    if raw[const.CSV_TEHB_INN_TIER2_FAM_PERSON_MOOP]:
         attr[const.TEHB_INN_TIER2_FAM_PERSON] = utils.get_num_int(raw[const.CSV_TEHB_INN_TIER2_FAM_PERSON_MOOP])
 
-    if raw[const.CSV_TEHB_INN_TIER2_FAM_GROUP_MOOP].strip():
+    if raw[const.CSV_TEHB_INN_TIER2_FAM_GROUP_MOOP]:
         attr[const.TEHB_INN_TIER2_FAM_GROUP] = utils.get_num_int(raw[const.CSV_TEHB_INN_TIER2_FAM_GROUP_MOOP])
 
-    if raw[const.CSV_TEHB_OON_INDIVIDUAL_MOOP].strip():
+    if raw[const.CSV_TEHB_OON_INDIVIDUAL_MOOP]:
         attr[const.TEHB_OON_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_TEHB_OON_INDIVIDUAL_MOOP])
 
-    if raw[const.CSV_TEHB_OON_FAM_PERSON_MOOP].strip():
+    if raw[const.CSV_TEHB_OON_FAM_PERSON_MOOP]:
         attr[const.TEHB_OON_FAM_PERSON] = utils.get_num_int(raw[const.CSV_TEHB_OON_FAM_PERSON_MOOP])
 
-    if raw[const.CSV_TEHB_OON_FAM_GROUP_MOOP].strip():
+    if raw[const.CSV_TEHB_OON_FAM_GROUP_MOOP]:
         attr[const.TEHB_OON_FAM_GROUP] = utils.get_num_int(raw[const.CSV_TEHB_OON_FAM_GROUP_MOOP])
 
-    if raw[const.CSV_TEHB_COMB_INDIVIDUAL_MOOP].strip():
+    if raw[const.CSV_TEHB_COMB_INDIVIDUAL_MOOP]:
         attr[const.TEHB_COMB_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_TEHB_COMB_INDIVIDUAL_MOOP])
 
-    if raw[const.CSV_TEHB_COMB_FAM_PERSON_MOOP].strip():
+    if raw[const.CSV_TEHB_COMB_FAM_PERSON_MOOP]:
         attr[const.TEHB_COMB_FAM_PERSON] = utils.get_num_int(raw[const.CSV_TEHB_COMB_FAM_PERSON_MOOP])
 
-    if raw[const.CSV_TEHB_COMB_FAM_GROUP_MOOP].strip():
+    if raw[const.CSV_TEHB_COMB_FAM_GROUP_MOOP]:
         attr[const.TEHB_COMB_FAM_GROUP] = utils.get_num_int(raw[const.CSV_TEHB_COMB_FAM_GROUP_MOOP])
 
     save_data(const.TABLE_M_PLAN_MOOP_INT, attr)
@@ -554,91 +555,91 @@ def add_medical_plan_moop_int(raw):
 def add_medical_plan_ded(raw):
     attr = dict()
 
-    if raw[const.CSV_PLAN_ID].strip():
+    if raw[const.CSV_PLAN_ID]:
         attr[const.PLAN_ID] = raw[const.CSV_PLAN_ID]
 
-    if raw[const.CSV_MEHB_INN_TIER1_INDIVIDUAL_DED].strip():
+    if raw[const.CSV_MEHB_INN_TIER1_INDIVIDUAL_DED]:
         attr[const.MEHB_INN_TIER1_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER1_INDIVIDUAL_DED])
 
-    if raw[const.CSV_MEHB_INN_TIER1_FAM_PERSON_DED].strip():
+    if raw[const.CSV_MEHB_INN_TIER1_FAM_PERSON_DED]:
         attr[const.MEHB_INN_TIER1_FAM_PERSON] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER1_FAM_PERSON_DED])
 
-    if raw[const.CSV_MEHB_INN_TIER1_FAM_GROUP_DED].strip():
+    if raw[const.CSV_MEHB_INN_TIER1_FAM_GROUP_DED]:
         attr[const.MEHB_INN_TIER1_FAM_GROUP] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER1_FAM_GROUP_DED])
 
-    if raw[const.CSV_MEHB_INN_TIER1_COINS_DED].strip():
+    if raw[const.CSV_MEHB_INN_TIER1_COINS_DED]:
         attr[const.MEHB_INN_TIER1_COINS] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER1_COINS_DED])
 
-    if raw[const.CSV_MEHB_INN_TIER2_INDIVIDUAL_DED].strip():
+    if raw[const.CSV_MEHB_INN_TIER2_INDIVIDUAL_DED]:
         attr[const.MEHB_INN_TIER2_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER2_INDIVIDUAL_DED])
 
-    if raw[const.CSV_MEHB_INN_TIER2_FAM_PERSON_DED].strip():
+    if raw[const.CSV_MEHB_INN_TIER2_FAM_PERSON_DED]:
         attr[const.MEHB_INN_TIER2_FAM_PERSON] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER2_FAM_PERSON_DED])
 
-    if raw[const.CSV_MEHB_INN_TIER2_FAM_GROUP_DED].strip():
+    if raw[const.CSV_MEHB_INN_TIER2_FAM_GROUP_DED]:
         attr[const.MEHB_INN_TIER2_FAM_GROUP] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER2_FAM_GROUP_DED])
 
-    if raw[const.CSV_MEHB_INN_TIER2_COINS_DED].strip():
+    if raw[const.CSV_MEHB_INN_TIER2_COINS_DED]:
         attr[const.MEHB_INN_TIER2_COINS] = utils.get_num_int(raw[const.CSV_MEHB_INN_TIER2_COINS_DED])
 
-    if raw[const.CSV_MEHB_OON_INDIVIDUAL_DED].strip():
+    if raw[const.CSV_MEHB_OON_INDIVIDUAL_DED]:
         attr[const.MEHB_OON_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_MEHB_OON_INDIVIDUAL_DED])
 
-    if raw[const.CSV_MEHB_OON_FAM_PERSON_DED].strip():
+    if raw[const.CSV_MEHB_OON_FAM_PERSON_DED]:
         attr[const.MEHB_OON_FAM_PERSON] = utils.get_num_int(raw[const.CSV_MEHB_OON_FAM_PERSON_DED])
 
-    if raw[const.CSV_MEHB_OON_FAM_GROUP_DED].strip():
+    if raw[const.CSV_MEHB_OON_FAM_GROUP_DED]:
         attr[const.MEHB_OON_FAM_GROUP] = utils.get_num_int(raw[const.CSV_MEHB_OON_FAM_GROUP_DED])
 
-    if raw[const.CSV_MEHB_COMB_INDIVIDUAL_DED].strip():
+    if raw[const.CSV_MEHB_COMB_INDIVIDUAL_DED]:
         attr[const.MEHB_COMB_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_MEHB_COMB_INDIVIDUAL_DED])
 
-    if raw[const.CSV_MEHB_COMB_FAM_PERSON_DED].strip():
+    if raw[const.CSV_MEHB_COMB_FAM_PERSON_DED]:
         attr[const.MEHB_COMB_FAM_PERSON] = utils.get_num_int(raw[const.CSV_MEHB_COMB_FAM_PERSON_DED])
 
-    if raw[const.CSV_MEHB_COMB_FAM_GROUP_DED].strip():
+    if raw[const.CSV_MEHB_COMB_FAM_GROUP_DED]:
         attr[const.MEHB_COMB_FAM_GROUP] = utils.get_num_int(raw[const.CSV_MEHB_COMB_FAM_GROUP_DED])
 
-    if raw[const.CSV_DEHB_INN_TIER1_INDIVIDUAL_DED].strip():
+    if raw[const.CSV_DEHB_INN_TIER1_INDIVIDUAL_DED]:
         attr[const.DEHB_INN_TIER1_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_DEHB_INN_TIER1_INDIVIDUAL_DED])
 
-    if raw[const.CSV_DEHB_INN_TIER1_FAM_PERSON_DED].strip():
+    if raw[const.CSV_DEHB_INN_TIER1_FAM_PERSON_DED]:
         attr[const.DEHB_INN_TIER1_FAM_PERSON] = utils.get_num_int(raw[const.CSV_DEHB_INN_TIER1_FAM_PERSON_DED])
 
-    if raw[const.CSV_DEHB_INN_TIER1_FAM_GROUP_DED].strip():
+    if raw[const.CSV_DEHB_INN_TIER1_FAM_GROUP_DED]:
         attr[const.DEHB_INN_TIER1_FAM_GROUP] = utils.get_num_int(raw[const.CSV_DEHB_INN_TIER1_FAM_GROUP_DED])
 
-    if raw[const.CSV_DEHB_INN_TIER1_COINS_DED].strip():
+    if raw[const.CSV_DEHB_INN_TIER1_COINS_DED]:
         attr[const.DEHB_INN_TIER1_COINS] = utils.get_num_int(raw[const.CSV_DEHB_INN_TIER1_COINS_DED])
 
-    if raw[const.CSV_DEHB_INN_TIER2_INDIVIDUAL_DED].strip():
+    if raw[const.CSV_DEHB_INN_TIER2_INDIVIDUAL_DED]:
         attr[const.DEHB_INN_TIER2_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_DEHB_INN_TIER2_INDIVIDUAL_DED])
 
-    if raw[const.CSV_DEHB_INN_TIER2_FAM_PERSON_DED].strip():
+    if raw[const.CSV_DEHB_INN_TIER2_FAM_PERSON_DED]:
         attr[const.DEHB_INN_TIER2_FAM_PERSON] = utils.get_num_int(raw[const.CSV_DEHB_INN_TIER2_FAM_PERSON_DED])
 
-    if raw[const.CSV_DEHB_INN_TIER2_FAM_GROUP_DED].strip():
+    if raw[const.CSV_DEHB_INN_TIER2_FAM_GROUP_DED]:
         attr[const.DEHB_INN_TIER2_FAM_GROUP] = utils.get_num_int(raw[const.CSV_DEHB_INN_TIER2_FAM_GROUP_DED])
 
-    if raw[const.CSV_DEHB_INN_TIER2_COINS_DED].strip():
+    if raw[const.CSV_DEHB_INN_TIER2_COINS_DED]:
         attr[const.DEHB_INN_TIER2_COINS] = utils.get_num_int(raw[const.CSV_DEHB_INN_TIER2_COINS_DED])
 
-    if raw[const.CSV_DEHB_OON_INDIVIDUAL_DED].strip():
+    if raw[const.CSV_DEHB_OON_INDIVIDUAL_DED]:
         attr[const.DEHB_OON_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_DEHB_OON_INDIVIDUAL_DED])
 
-    if raw[const.CSV_DEHB_OON_FAM_PERSON_DED].strip():
+    if raw[const.CSV_DEHB_OON_FAM_PERSON_DED]:
         attr[const.DEHB_OON_FAM_PERSON] = utils.get_num_int(raw[const.CSV_DEHB_OON_FAM_PERSON_DED])
 
-    if raw[const.CSV_DEHB_OON_FAM_GROUP_DED].strip():
+    if raw[const.CSV_DEHB_OON_FAM_GROUP_DED]:
         attr[const.DEHB_OON_FAM_GROUP] = utils.get_num_int(raw[const.CSV_DEHB_OON_FAM_GROUP_DED])
 
-    if raw[const.CSV_DEHB_COMB_INDIVIDUAL_DED].strip():
+    if raw[const.CSV_DEHB_COMB_INDIVIDUAL_DED]:
         attr[const.DEHB_COMB_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_DEHB_COMB_INDIVIDUAL_DED])
 
-    if raw[const.CSV_DEHB_COMB_FAM_PERSON_DED].strip():
+    if raw[const.CSV_DEHB_COMB_FAM_PERSON_DED]:
         attr[const.DEHB_COMB_FAM_PERSON] = utils.get_num_int(raw[const.CSV_DEHB_COMB_FAM_PERSON_DED])
 
-    if raw[const.CSV_DEHB_COMB_FAM_GROUP_DED].strip():
+    if raw[const.CSV_DEHB_COMB_FAM_GROUP_DED]:
         attr[const.DEHB_COMB_FAM_GROUP] = utils.get_num_int(raw[const.CSV_DEHB_COMB_FAM_GROUP_DED])
 
     save_data(const.TABLE_M_PLAN_DED, attr)
@@ -647,49 +648,49 @@ def add_medical_plan_ded(raw):
 def add_medical_plan_ded_int(raw):
     attr = dict()
 
-    if raw[const.CSV_PLAN_ID].strip():
+    if raw[const.CSV_PLAN_ID]:
         attr[const.PLAN_ID] = raw[const.CSV_PLAN_ID]
 
-    if raw[const.CSV_TEHB_INN_TIER1_INDIVIDUAL_DED].strip():
+    if raw[const.CSV_TEHB_INN_TIER1_INDIVIDUAL_DED]:
         attr[const.TEHB_INN_TIER1_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_TEHB_INN_TIER1_INDIVIDUAL_DED])
 
-    if raw[const.CSV_TEHB_INN_TIER1_FAM_PERSON_DED].strip():
+    if raw[const.CSV_TEHB_INN_TIER1_FAM_PERSON_DED]:
         attr[const.TEHB_INN_TIER1_FAM_PERSON] = utils.get_num_int(raw[const.CSV_TEHB_INN_TIER1_FAM_PERSON_DED])
 
-    if raw[const.CSV_TEHB_INN_TIER1_FAM_GROUP_DED].strip():
+    if raw[const.CSV_TEHB_INN_TIER1_FAM_GROUP_DED]:
         attr[const.TEHB_INN_TIER1_FAM_GROUP] = utils.get_num_int(raw[const.CSV_TEHB_INN_TIER1_FAM_GROUP_DED])
 
-    if raw[const.CSV_TEHB_INN_TIER1_COINS_DED].strip():
+    if raw[const.CSV_TEHB_INN_TIER1_COINS_DED]:
         attr[const.TEHB_INN_TIER1_COINS] = utils.get_num_int(raw[const.CSV_TEHB_INN_TIER1_COINS_DED])
 
-    if raw[const.CSV_TEHB_INN_TIER2_INDIVIDUAL_DED].strip():
+    if raw[const.CSV_TEHB_INN_TIER2_INDIVIDUAL_DED]:
         attr[const.TEHB_INN_TIER2_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_TEHB_INN_TIER2_INDIVIDUAL_DED])
 
-    if raw[const.CSV_TEHB_INN_TIER2_FAM_PERSON_DED].strip():
+    if raw[const.CSV_TEHB_INN_TIER2_FAM_PERSON_DED]:
         attr[const.TEHB_INN_TIER2_FAM_PERSON] = utils.get_num_int(raw[const.CSV_TEHB_INN_TIER2_FAM_PERSON_DED])
 
-    if raw[const.CSV_TEHB_INN_TIER2_FAM_GROUP_DED].strip():
+    if raw[const.CSV_TEHB_INN_TIER2_FAM_GROUP_DED]:
         attr[const.TEHB_INN_TIER2_FAM_GROUP] = utils.get_num_int(raw[const.CSV_TEHB_INN_TIER2_FAM_GROUP_DED])
 
-    if raw[const.CSV_TEHB_INN_TIER2_COINS_DED].strip():
+    if raw[const.CSV_TEHB_INN_TIER2_COINS_DED]:
         attr[const.TEHB_INN_TIER2_COINS] = utils.get_num_int(raw[const.CSV_TEHB_INN_TIER2_COINS_DED])
 
-    if raw[const.CSV_TEHB_OON_INDIVIDUAL_DED].strip():
+    if raw[const.CSV_TEHB_OON_INDIVIDUAL_DED]:
         attr[const.TEHB_OON_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_TEHB_OON_INDIVIDUAL_DED])
 
-    if raw[const.CSV_TEHB_OON_FAM_PERSON_DED].strip():
+    if raw[const.CSV_TEHB_OON_FAM_PERSON_DED]:
         attr[const.TEHB_OON_FAM_PERSON] = utils.get_num_int(raw[const.CSV_TEHB_OON_FAM_PERSON_DED])
 
-    if raw[const.CSV_TEHB_OON_FAM_GROUP_DED].strip():
+    if raw[const.CSV_TEHB_OON_FAM_GROUP_DED]:
         attr[const.TEHB_OON_FAM_GROUP] = utils.get_num_int(raw[const.CSV_TEHB_OON_FAM_GROUP_DED])
 
-    if raw[const.CSV_TEHB_COMB_INDIVIDUAL_DED].strip():
+    if raw[const.CSV_TEHB_COMB_INDIVIDUAL_DED]:
         attr[const.TEHB_COMB_INDIVIDUAL] = utils.get_num_int(raw[const.CSV_TEHB_COMB_INDIVIDUAL_DED])
 
-    if raw[const.CSV_TEHB_COMB_FAM_PERSON_DED].strip():
+    if raw[const.CSV_TEHB_COMB_FAM_PERSON_DED]:
         attr[const.TEHB_COMB_FAM_PERSON] = utils.get_num_int(raw[const.CSV_TEHB_COMB_FAM_PERSON_DED])
 
-    if raw[const.CSV_TEHB_COMB_FAM_GROUP_DED].strip():
+    if raw[const.CSV_TEHB_COMB_FAM_GROUP_DED]:
         attr[const.TEHB_COMB_FAM_GROUP] = utils.get_num_int(raw[const.CSV_TEHB_COMB_FAM_GROUP_DED])
 
     save_data(const.TABLE_M_PLAN_DED_INT, attr)
@@ -724,19 +725,18 @@ def load_benefits():
 def add_plan_benefits(raw):
     attr = dict()
 
-    if raw[const.CSV_PLAN_ID].strip():
+    if raw[const.CSV_PLAN_ID]:
         attr[const.PLAN_ID] = raw[const.CSV_PLAN_ID]
 
-    if raw[const.CSV_BENEFIT_NAME].strip():
-        attr[const.BENEFIT_NAME] = raw[const.CSV_BENEFIT_NAME].strip()
+    if raw[const.CSV_BENEFIT_NAME]:
+        attr[const.BENEFIT_NAME] = raw[const.CSV_BENEFIT_NAME]
 
-    if raw[const.CSV_COPAY_INN_TIER1].strip():
+    if raw[const.CSV_COPAY_INN_TIER1]:
         attr[const.COPAY_INN_TIER1] = utils.get_num_decimal(raw[const.CSV_COPAY_INN_TIER1])
         desc = utils.get_desc(raw[const.CSV_COPAY_INN_TIER1])
-        if desc == 'Not Applicable':
-            attr[const.COPAY_INN_TIER1] = None
-            attr[const.COPAY_INN_TIER1_TYPE] = Enum.copay_type[desc]
-        elif desc:
+        if desc:
+            if desc == 'Not Applicable':
+                attr[const.COPAY_INN_TIER1] = None
             attr[const.COPAY_INN_TIER1_TYPE] = Enum.copay_type[desc]
         else:
             attr[const.COPAY_INN_TIER1_TYPE] = Enum.copay_type["Copay"]
@@ -744,72 +744,67 @@ def add_plan_benefits(raw):
         attr[const.COPAY_INN_TIER1] = None
         attr[const.COPAY_INN_TIER1_TYPE] = Enum.copay_type["Not Applicable"]
 
-    if raw[const.CSV_COPAY_INN_TIER2].strip():
+    if raw[const.CSV_COPAY_INN_TIER2]:
         attr[const.COPAY_INN_TIER2] = utils.get_num_decimal(raw[const.CSV_COPAY_INN_TIER2])
         desc = utils.get_desc(raw[const.CSV_COPAY_INN_TIER2])
-        if desc == 'Not Applicable':
-            attr[const.COPAY_INN_TIER1] = None
-            attr[const.COPAY_INN_TIER1_TYPE] = Enum.copay_type[desc]
-        elif desc:
+        if desc:
+            if desc == 'Not Applicable':
+                attr[const.COPAY_INN_TIER2] = None
             attr[const.COPAY_INN_TIER2_TYPE] = Enum.copay_type[desc]
         else:
-            attr[const.COPAY_INN_TIER1_TYPE] = Enum.copay_type["Copay"]
+            attr[const.COPAY_INN_TIER2_TYPE] = Enum.copay_type["Copay"]
     else:
         attr[const.COPAY_INN_TIER2] = None
         attr[const.COPAY_INN_TIER2_TYPE] = Enum.copay_type["Not Applicable"]
 
-    if raw[const.CSV_COPAY_OON].strip():
+    if raw[const.CSV_COPAY_OON]:
         attr[const.COPAY_OON] = utils.get_num_decimal(raw[const.CSV_COPAY_OON])
         desc = utils.get_desc(raw[const.CSV_COPAY_OON])
-        if desc == 'Not Applicable':
-            attr[const.COPAY_INN_TIER1] = None
-            attr[const.COPAY_INN_TIER1_TYPE] = Enum.copay_type[desc]
-        elif desc:
+        if desc:
+            if desc == 'Not Applicable':
+                attr[const.COPAY_OON] = None
             attr[const.COPAY_OON_TYPE] = Enum.copay_type[desc]
         else:
-            attr[const.COPAY_INN_TIER1_TYPE] = Enum.copay_type["Copay"]
+            attr[const.COPAY_OON_TYPE] = Enum.copay_type["Copay"]
     else:
         attr[const.COPAY_OON] = None
         attr[const.COPAY_OON_TYPE] = Enum.copay_type["Not Applicable"]
 
-    if raw[const.CSV_COINS_INN_TIER1].strip():
+    if raw[const.CSV_COINS_INN_TIER1]:
         attr[const.COINS_INN_TIER1] = utils.get_num_decimal(raw[const.CSV_COINS_INN_TIER1])
         desc = utils.get_desc(raw[const.CSV_COINS_INN_TIER1])
-        if desc == 'Not Applicable':
-            attr[const.COPAY_INN_TIER1] = None
-            attr[const.COPAY_INN_TIER1_TYPE] = Enum.coins_type[desc]
-        elif desc:
+        if desc:
+            if desc == 'Not Applicable':
+                attr[const.COINS_INN_TIER1] = None
             attr[const.COINS_INN_TIER1_TYPE] = Enum.coins_type[desc]
         else:
-            attr[const.COPAY_INN_TIER1_TYPE] = Enum.coins_type["Coinsurance"]
+            attr[const.COINS_INN_TIER1_TYPE] = Enum.coins_type["Coinsurance"]
     else:
         attr[const.COINS_INN_TIER1] = None
         attr[const.COINS_INN_TIER1_TYPE] = Enum.coins_type["Not Applicable"]
 
-    if raw[const.CSV_COINS_INN_TIER2].strip():
+    if raw[const.CSV_COINS_INN_TIER2]:
         attr[const.COINS_INN_TIER2] = utils.get_num_decimal(raw[const.CSV_COINS_INN_TIER2])
         desc = utils.get_desc(raw[const.CSV_COINS_INN_TIER2])
-        if desc == 'Not Applicable':
-            attr[const.COPAY_INN_TIER1] = None
-            attr[const.COPAY_INN_TIER1_TYPE] = Enum.coins_type[desc]
-        elif desc:
+        if desc:
+            if desc == 'Not Applicable':
+                attr[const.COINS_INN_TIER2] = None
             attr[const.COINS_INN_TIER2_TYPE] = Enum.coins_type[desc]
         else:
-            attr[const.COPAY_INN_TIER1_TYPE] = Enum.coins_type["Coinsurance"]
+            attr[const.COINS_INN_TIER2_TYPE] = Enum.coins_type["Coinsurance"]
     else:
         attr[const.COINS_INN_TIER2] = None
         attr[const.COINS_INN_TIER2_TYPE] = Enum.coins_type["Not Applicable"]
 
-    if raw[const.CSV_COINS_OON].strip():
+    if raw[const.CSV_COINS_OON]:
         attr[const.COINS_OON] = utils.get_num_decimal(raw[const.CSV_COINS_OON])
         desc = utils.get_desc(raw[const.CSV_COINS_OON])
-        if desc == 'Not Applicable':
-            attr[const.COPAY_INN_TIER1] = None
-            attr[const.COPAY_INN_TIER1_TYPE] = Enum.coins_type[desc]
-        elif desc:
+        if desc:
+            if desc == 'Not Applicable':
+                attr[const.COINS_OON] = None
             attr[const.COINS_OON_TYPE] = Enum.coins_type[desc]
         else:
-            attr[const.COPAY_INN_TIER1_TYPE] = Enum.coins_type["Coinsurance"]
+            attr[const.COINS_OON_TYPE] = Enum.coins_type["Coinsurance"]
     else:
         attr[const.COINS_OON] = None
         attr[const.COINS_OON_TYPE] = Enum.coins_type["Not Applicable"]
@@ -829,7 +824,7 @@ def add_plan_benefits(raw):
     else:
         raw[const.EXCL_FROM_OON_MOOP] = False
 
-    if raw[const.CSV_BENEFIT_EXCL].strip():
+    if raw[const.CSV_BENEFIT_EXCL]:
         attr[const.BENEFIT_EXCL] = raw[const.CSV_BENEFIT_EXCL]
 
     # print(attr)
@@ -840,19 +835,19 @@ def add_plan_benefits(raw):
 def add_plan_benefits_limit(raw):
     attr = dict()
 
-    if raw[const.CSV_PLAN_ID].strip():
+    if raw[const.CSV_PLAN_ID]:
         attr[const.PLAN_ID] = raw[const.CSV_PLAN_ID]
 
-    if raw[const.CSV_BENEFIT_NAME].strip():
-        attr[const.BENEFIT_NAME] = raw[const.CSV_BENEFIT_NAME].strip()
+    if raw[const.CSV_BENEFIT_NAME]:
+        attr[const.BENEFIT_NAME] = raw[const.CSV_BENEFIT_NAME]
 
-    if raw[const.CSV_BENEFIT_LIMIT_QTY].strip():
+    if raw[const.CSV_BENEFIT_LIMIT_QTY]:
         attr[const.BENEFIT_LIMIT_QTY] = raw[const.CSV_BENEFIT_LIMIT_QTY]
 
-    if raw[const.CSV_BENEFIT_LIMIT_UNIT].strip():
+    if raw[const.CSV_BENEFIT_LIMIT_UNIT]:
         attr[const.BENEFIT_LIMIT_UNIT] = raw[const.CSV_BENEFIT_LIMIT_UNIT]
 
-    if raw[const.CSV_BENEFIT_EXPLANATION].strip():
+    if raw[const.CSV_BENEFIT_EXPLANATION]:
         attr[const.BENEFIT_EXPLANATION] = raw[const.CSV_BENEFIT_EXPLANATION]
 
     # print(attr)
@@ -890,16 +885,16 @@ def load_rate():
 def add_rate_individual(raw):
     attr = dict()
 
-    if raw[const.CSV_RATE_EFF_DATE].strip():
+    if raw[const.CSV_RATE_EFF_DATE]:
         attr[const.RATE_EFF_DATE] = raw[const.CSV_RATE_EFF_DATE]
 
-    if raw[const.CSV_RATE_EXPI_DATE].strip():
+    if raw[const.CSV_RATE_EXPI_DATE]:
         attr[const.RATE_EXPI_DATE] = raw[const.CSV_RATE_EXPI_DATE]
 
-    if raw[const.CSV_RATE_STD_COMP_ID].strip():
+    if raw[const.CSV_RATE_STD_COMP_ID]:
         attr[const.RATE_STD_COMP_ID] = raw[const.CSV_RATE_STD_COMP_ID]
 
-    if raw[const.CSV_RATE_AREA_ID].strip():
+    if raw[const.CSV_RATE_AREA_ID]:
         attr[const.RATE_AREA_ID] = utils.get_num_int(raw[const.CSV_RATE_AREA_ID])
 
     if raw[const.CSV_RATE_TOBACCO] == 'Tobacco User/Non-Tobacco User':
@@ -907,15 +902,15 @@ def add_rate_individual(raw):
     else:
         attr[const.RATE_TOBACCO] = False
 
-    if raw[const.CSV_RATE_AGE].strip():
+    if raw[const.CSV_RATE_AGE]:
         age_pair = utils.get_age_pair(raw[const.CSV_RATE_AGE])
         attr[const.RATE_AGE_FROM] = age_pair[0]
         attr[const.RATE_AGE_TO] = age_pair[1]
 
-    if raw[const.CSV_RATE_INDI_RATE].strip():
+    if raw[const.CSV_RATE_INDI_RATE]:
         attr[const.RATE_INDI_RATE] = raw[const.CSV_RATE_INDI_RATE]
 
-    if raw[const.CSV_RATE_INDI_TOBACCO_RATE].strip():
+    if raw[const.CSV_RATE_INDI_TOBACCO_RATE]:
         attr[const.RATE_INDI_TOBACCO_RATE] = raw[const.CSV_RATE_INDI_TOBACCO_RATE]
 
     save_data(const.TABLE_RATE_INDIVIDUAL, attr)
@@ -924,19 +919,19 @@ def add_rate_individual(raw):
 def add_rate_family(raw):
     attr = dict()
 
-    if raw[const.CSV_RATE_EFF_DATE].strip():
+    if raw[const.CSV_RATE_EFF_DATE]:
         attr[const.RATE_FAM_EFF_DATE] = raw[const.CSV_RATE_EFF_DATE]
 
-    if raw[const.CSV_RATE_EXPI_DATE].strip():
+    if raw[const.CSV_RATE_EXPI_DATE]:
         attr[const.RATE_FAM_EXPI_DATE] = raw[const.CSV_RATE_EXPI_DATE]
 
-    if raw[const.CSV_RATE_STD_COMP_ID].strip():
+    if raw[const.CSV_RATE_STD_COMP_ID]:
         attr[const.RATE_FAM_STD_COMP_ID] = raw[const.CSV_RATE_STD_COMP_ID]
 
-    if raw[const.CSV_RATE_AREA_ID].strip():
+    if raw[const.CSV_RATE_AREA_ID]:
         attr[const.RATE_FAM_AREA_ID] = utils.get_num_int(raw[const.CSV_RATE_AREA_ID])
 
-    if raw[const.CSV_RATE_INDI_RATE].strip():
+    if raw[const.CSV_RATE_INDI_RATE]:
         attr[const.RATE_FAM_INDI_RATE] = raw[const.CSV_RATE_INDI_RATE]
 
     if raw[const.CSV_RATE_COUPLE]:
@@ -982,6 +977,93 @@ def add_rate_family(raw):
         save_data(const.TABLE_RATE_FAMILY, attr)
 
 
+def load_business_rules():
+    print("------LOAD Business_Rules_PUF.csv------")
+
+    with open(file_business_rules, mode='r', encoding='iso-8859-1') as fd:
+        # Count total row number
+        reader = csv.DictReader(fd)
+        count = 0
+        rows = sum(1 for _ in reader)
+        fd.seek(0)
+
+        # Loading data into database
+        reader = csv.DictReader(fd)
+        for raw_data in reader:
+            add_business_rules(raw_data)
+
+            add_business_rules_cohabit(raw_data)
+
+            count += 1
+            print('\rLoading Process:{:.2f}%'.format(count * 100 / rows), end='')
+
+    conn.commit()
+    print("\nDONE!")
+
+
+def add_business_rules(raw):
+    attr = dict()
+
+    if raw[const.CSV_RULE_STD_COMP_ID]:
+        attr[const.RULE_STD_COMP_ID] = raw[const.CSV_RULE_STD_COMP_ID]
+
+    if raw[const.CSV_RULE_PROD_ID]:
+        attr[const.RULE_PROD_ID] = raw[const.CSV_RULE_PROD_ID]
+
+    if raw[const.CSV_RULE_RATE_RULE_TYPE] in Enum.rate_rule_type:
+        attr[const.RULE_RATE_RULE_TYPE] = Enum.rate_rule_type[raw[const.CSV_RULE_RATE_RULE_TYPE]]
+
+    if raw[const.CSV_RULE_SINGLE_PARENT_MAX_DEPENDENT]:
+        attr[const.RULE_SINGLE_PARENT_MAX_DEPENDENT] = raw[const.CSV_RULE_SINGLE_PARENT_MAX_DEPENDENT]
+
+    if raw[const.CSV_RULE_TWO_PARENTS_MAX_DEPENDENT]:
+        attr[const.RULE_TWO_PARENTS_MAX_DEPENDENT] = raw[const.CSV_RULE_TWO_PARENTS_MAX_DEPENDENT]
+
+    if raw[const.CSV_RULE_DEPENDENT_MAX_AGE] != 'Not Applicable':
+        attr[const.RULE_DEPENDENT_MAX_AGE] = raw[const.CSV_RULE_DEPENDENT_MAX_AGE]
+
+    if raw[const.CSV_RULE_CHILD_ONLY_MAX_CHILDREN]:
+        attr[const.RULE_CHILD_ONLY_MAX_CHILDREN] = raw[const.CSV_RULE_CHILD_ONLY_MAX_CHILDREN]
+
+    if raw[const.CSV_RULE_DOMESTIC_PARTNER_AS_SPOUSE] == 'Yes':
+        attr[const.RULE_DOMESTIC_PARTNER_AS_SPOUSE] = True
+    else:
+        attr[const.RULE_DOMESTIC_PARTNER_AS_SPOUSE] = False
+
+    if raw[const.CSV_RULE_SAME_SEX_PARTNER_AS_SPOUSE] == 'Yes':
+        attr[const.RULE_SAME_SEX_PARTNER_AS_SPOUSE] = True
+    else:
+        attr[const.RULE_SAME_SEX_PARTNER_AS_SPOUSE] = False
+
+    if raw[const.CSV_RULE_AGE_DETERMINE_RULE] in Enum.age_rule_type:
+        attr[const.RULE_AGE_DETERMINE_RULE] = Enum.age_rule_type[raw[const.CSV_RULE_AGE_DETERMINE_RULE]]
+
+    if raw[const.CSV_RULE_MIN_TOBACCO_FREE_MONTHS] != 'Not Applicable':
+        attr[const.RULE_MIN_TOBACCO_FREE_MONTHS] = raw[const.CSV_RULE_MIN_TOBACCO_FREE_MONTHS]
+
+    save_data(const.TABLE_BUSINESS_RULE, attr)
+
+
+def add_business_rules_cohabit(raw):
+    attr = dict()
+
+    if raw[const.CSV_RULE_STD_COMP_ID]:
+        attr[const.RULE_STD_COMP_ID] = raw[const.CSV_RULE_STD_COMP_ID]
+
+    if raw[const.CSV_RULE_COHABIT_RULE]:
+        cohabit_pairs = raw[const.CSV_RULE_COHABIT_RULE].split(';')
+        for cohabit_pair in cohabit_pairs:
+            pair = cohabit_pair.split(',')
+            cohabit_obj = pair[0]
+            cohabit_required = pair[1]
+            attr[const.COHABIT_TYPE] = Enum.cohabit_type[cohabit_obj]
+            if cohabit_required == 'Yes':
+                attr[const.COHABIT_REQUIRED] = True
+            else:
+                attr[const.COHABIT_REQUIRED] = False
+            save_data(const.TABLE_BUSINESS_RULE_COHABIT, attr)
+
+
 if __name__ == '__main__':
     # Connect to database
     conn = psycopg2.connect("host=%s dbname=%s user=%s" % (const.HOST_NAME,
@@ -997,3 +1079,6 @@ if __name__ == '__main__':
 
     # Load Rate
     load_rate()
+
+    # Load Business Rules
+    load_business_rules()

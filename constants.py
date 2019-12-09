@@ -36,6 +36,9 @@ Const.TABLE_FAMILY_TYPE = "family_type"
 Const.TABLE_COPAY_TYPE = "copay_type"
 Const.TABLE_COINS_TYPE = "coins_type"
 Const.TABLE_DESIGN_TYPE = "design_type"
+Const.TABLE_RATE_RULE_TYPE = "rate_rule_type"
+Const.TABLE_AGE_RULE_TYPE = "age_rule_type"
+Const.TABLE_COHABIT_TYPE = "cohabit_type"
 
 # Constants - TABLE NAME - Data Set
 Const.TABLE_PLAN = "plans"
@@ -54,7 +57,8 @@ Const.TABLE_BENEFIT = "plan_benefit"
 Const.TABLE_BENEFIT_LIMIT = "plan_benefit_limitation"
 Const.TABLE_RATE_INDIVIDUAL = "rate_individual"
 Const.TABLE_RATE_FAMILY = "rate_family"
-
+Const.TABLE_BUSINESS_RULE = "business_rules"
+Const.TABLE_BUSINESS_RULE_COHABIT = "business_rules_cohabitation"
 
 # Constants - TABLE ATTRIBUTES - Plans
 Const.PLAN_ID = "plan_id"
@@ -222,6 +226,24 @@ Const.RATE_FAM_AREA_ID = "rating_area_id"
 Const.RATE_FAM_INDI_RATE = "individual"
 Const.RATE_FAM_TYPE = "family_type"
 Const.RATE_FAM_RATE = "family_rate"
+
+# Constants - TABLE ATTRIBUTES - Business Rules
+Const.RULE_STD_COMP_ID = "std_component_id"
+Const.RULE_PROD_ID = "product_id"
+Const.RULE_RATE_RULE_TYPE = "rate_determination_rule_type"
+Const.RULE_SINGLE_PARENT_MAX_DEPENDENT = "single_parent_max_dependent"
+Const.RULE_TWO_PARENTS_MAX_DEPENDENT = "two_parents_max_dependent"
+Const.RULE_DEPENDENT_MAX_AGE = "dependent_max_age"
+Const.RULE_CHILD_ONLY_MAX_CHILDREN = "children_only_max_children"
+Const.RULE_DOMESTIC_PARTNER_AS_SPOUSE = "domestic_partner_as_spouse"
+Const.RULE_SAME_SEX_PARTNER_AS_SPOUSE = "same_sex_partner_as_spouse"
+Const.RULE_AGE_DETERMINE_RULE = "age_determination_rule"
+Const.RULE_MIN_TOBACCO_FREE_MONTHS = "min_tobacco_free_months"
+
+# Constants - TABLE ATTRIBUTES - Business Rules Cohabitation
+Const.COHABIT_STD_COMP_ID = "std_component_id"
+Const.COHABIT_TYPE = "cohabit_type"
+Const.COHABIT_REQUIRED = "cohabit_required"
 
 # Constants - DATA SET - Plans
 Const.CSV_PLAN_ID = "PlanId"
@@ -396,3 +418,17 @@ Const.CSV_RATE_PRIM_THREE_DEPENDENT = "PrimarySubscriberAndThreeOrMoreDependents
 Const.CSV_RATE_COUPLE_ONE_DEPENDENT = "CoupleAndOneDependent"
 Const.CSV_RATE_COUPLE_TWO_DEPENDENT = "CoupleAndTwoDependents"
 Const.CSV_RATE_COUPLE_THREE_DEPENDENT = "CoupleAndThreeOrMoreDependents"
+
+# Constants - DATA SET - Business Rules
+Const.CSV_RULE_STD_COMP_ID = "StandardComponentId"
+Const.CSV_RULE_PROD_ID = "ProductId"
+Const.CSV_RULE_RATE_RULE_TYPE = "EnrolleeContractRateDeterminationRule"
+Const.CSV_RULE_SINGLE_PARENT_MAX_DEPENDENT = "SingleParentFamilyMaxDependentsRule"
+Const.CSV_RULE_TWO_PARENTS_MAX_DEPENDENT = "TwoParentFamilyMaxDependentsRule"
+Const.CSV_RULE_DEPENDENT_MAX_AGE = "DependentMaximumAgRule"
+Const.CSV_RULE_CHILD_ONLY_MAX_CHILDREN = "ChildrenOnlyContractMaxChildrenRule"
+Const.CSV_RULE_DOMESTIC_PARTNER_AS_SPOUSE = "DomesticPartnerAsSpouseIndicator"
+Const.CSV_RULE_SAME_SEX_PARTNER_AS_SPOUSE = "SameSexPartnerAsSpouseIndicator"
+Const.CSV_RULE_AGE_DETERMINE_RULE = "AgeDeterminationRule"
+Const.CSV_RULE_MIN_TOBACCO_FREE_MONTHS = "MinimumTobaccoFreeMonthsRule"
+Const.CSV_RULE_COHABIT_RULE = "CohabitationRule"

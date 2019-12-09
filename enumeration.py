@@ -34,6 +34,15 @@ class Enum:
     # Table - <design_type>
     design_type = dict()
 
+    # Table - <rate_rule_type>
+    rate_rule_type = dict()
+
+    # Table - <age_rule_type>
+    age_rule_type = dict()
+
+    # Table - <cohabit_type>
+    cohabit_type = dict()
+
     @classmethod
     def init(cls, hostname, dbname, user):
         conn = psycopg2.connect("host=%s dbname=%s user=%s" % (hostname, dbname, user))
@@ -50,6 +59,9 @@ class Enum:
         cls.load_type_table(cursor, cls.copay_type, constants.TABLE_COPAY_TYPE)
         cls.load_type_table(cursor, cls.coins_type, constants.TABLE_COINS_TYPE)
         cls.load_type_table(cursor, cls.design_type, constants.TABLE_DESIGN_TYPE)
+        cls.load_type_table(cursor, cls.rate_rule_type, constants.TABLE_RATE_RULE_TYPE)
+        cls.load_type_table(cursor, cls.age_rule_type, constants.TABLE_AGE_RULE_TYPE)
+        cls.load_type_table(cursor, cls.cohabit_type, constants.TABLE_COHABIT_TYPE)
 
         conn.close()
 

@@ -162,6 +162,36 @@ CREATE TABLE design_type
 ALTER TABLE design_type
     OWNER TO manager;
 
+CREATE TABLE rate_rule_type
+(
+    id        INT,
+    type_name VARCHAR(127),
+    primary key (id)
+);
+
+ALTER TABLE rate_rule_type
+    OWNER TO manager;
+
+CREATE TABLE age_rule_type
+(
+    id        INT,
+    type_name VARCHAR(127),
+    primary key (id)
+);
+
+ALTER TABLE age_rule_type
+    OWNER TO manager;
+
+CREATE TABLE cohabit_type
+(
+    id        INT,
+    type_name VARCHAR(31),
+    primary key (id)
+);
+
+ALTER TABLE cohabit_type
+    OWNER TO manager;
+
 /* -------------------------Plan Attributes Data Set--------------------------- */
 CREATE TABLE plans
 (
@@ -501,6 +531,36 @@ CREATE TABLE rate_family
 ALTER TABLE rate_family
     OWNER TO manager;
 
+/* -------------------------Business Rule Data Set--------------------------- */
+CREATE TABLE business_rules
+(
+    std_component_id             CHAR(14),
+    product_id                   CHAR(10),
+    rate_determination_rule_type INT REFERENCES rate_rule_type (id),
+    single_parent_max_dependent  VARCHAR(15),
+    two_parents_max_dependent    VARCHAR(15),
+    dependent_max_age            INT,
+    children_only_max_children   VARCHAR(15),
+    domestic_partner_as_spouse   BOOLEAN,
+    same_sex_partner_as_spouse   BOOLEAN,
+    age_determination_rule       INT REFERENCES age_rule_type (id),
+    min_tobacco_free_months      INT,
+    PRIMARY KEY (std_component_id)
+);
+
+ALTER TABLE business_rules
+    OWNER TO manager;
+
+CREATE TABLE business_rules_cohabitation
+(
+    std_component_id CHAR(14),
+    cohabit_type     INT REFERENCES cohabit_type (id),
+    cohabit_required BOOLEAN
+);
+
+ALTER TABLE business_rules_cohabitation
+    OWNER TO manager;
+
 /* -------------------------Enumeration Initialization--------------------------- */
 
 INSERT INTO market_coverage_type
@@ -620,3 +680,74 @@ INSERT INTO design_type
 VALUES (5, 'Design Type 5');
 INSERT INTO design_type
 VALUES (6, 'Not Applicable');
+
+INSERT INTO rate_rule_type
+VALUES (1, 'A different rate (specifically for parties of two or more)for each enrollee is added together');
+INSERT INTO rate_rule_type
+VALUES (2, 'There are rates specifically for couples and for families (not just addition of individual rates)');
+
+INSERT INTO age_rule_type
+VALUES (1, 'Age on effective date');
+INSERT INTO age_rule_type
+VALUES (2, 'Age on insurance date (age on birthday nearest the effective date)');
+INSERT INTO age_rule_type
+VALUES (3, 'Age on January 1st of the effective date year');
+
+INSERT INTO cohabit_type
+VALUES (1, 'Spouse');
+INSERT INTO cohabit_type
+VALUES (2, 'Father or Mother');
+INSERT INTO cohabit_type
+VALUES (3, 'Grandfather or Grandmother');
+INSERT INTO cohabit_type
+VALUES (4, 'Grandson or Granddaughter');
+INSERT INTO cohabit_type
+VALUES (5, 'Uncle or Aunt');
+INSERT INTO cohabit_type
+VALUES (6, 'Nephew or Niece');
+INSERT INTO cohabit_type
+VALUES (7, 'Cousin');
+INSERT INTO cohabit_type
+VALUES (8, 'Adopted Child');
+INSERT INTO cohabit_type
+VALUES (9, 'Foster Child');
+INSERT INTO cohabit_type
+VALUES (10, 'Son-in-Law or Daughter-in-Law');
+INSERT INTO cohabit_type
+VALUES (11, 'Brother-in-Law or Sister-in-Law');
+INSERT INTO cohabit_type
+VALUES (12, 'Mother-in-Law or Father-in Law');
+INSERT INTO cohabit_type
+VALUES (13, 'Brother or Sister');
+INSERT INTO cohabit_type
+VALUES (14, 'Ward');
+INSERT INTO cohabit_type
+VALUES (15, 'Stepparent');
+INSERT INTO cohabit_type
+VALUES (16, 'Stepson or Stepdaughter');
+INSERT INTO cohabit_type
+VALUES (17, 'Self');
+INSERT INTO cohabit_type
+VALUES (18, 'Child');
+INSERT INTO cohabit_type
+VALUES (19, 'Sponsored Dependent');
+INSERT INTO cohabit_type
+VALUES (20, 'Dependent on a Minor Dependent');
+INSERT INTO cohabit_type
+VALUES (21, 'Ex-Spouse');
+INSERT INTO cohabit_type
+VALUES (22, 'Guardian');
+INSERT INTO cohabit_type
+VALUES (23, 'Court Appointed Guardian');
+INSERT INTO cohabit_type
+VALUES (24, 'Collateral Dependent');
+INSERT INTO cohabit_type
+VALUES (25, 'Life Partner');
+INSERT INTO cohabit_type
+VALUES (26, 'Annultant');
+INSERT INTO cohabit_type
+VALUES (27, 'Trustee');
+INSERT INTO cohabit_type
+VALUES (28, 'Other Relationship');
+INSERT INTO cohabit_type
+VALUES (29, 'Other Relative');

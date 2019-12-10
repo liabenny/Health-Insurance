@@ -98,8 +98,8 @@ FROM rate_individual,
          WHERE metal_level = 5
      ) r1
 WHERE r1.std_component_id = rate_individual.std_component_id
-  AND age_range_from = 15
-  AND age_range_to = 15
+  AND age_range_from <= 15
+  AND age_range_to >= 15
   AND effective_date = '2020-01-01'
   AND expiration_date = '2020-12-31'
 GROUP BY state, effective_date, expiration_date

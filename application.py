@@ -100,7 +100,7 @@ def main():
         print("\n==============Function Menu==============")
         functions = list()
         init(functions)
-        print(tabulate(functions, ["Index", "Options"], tablefmt="fancy_grid"))
+        print(tabulate(functions, ["Option", "Description"], tablefmt="fancy_grid"))
         index = input("\nPlease select an option:")
         if index.strip() == "1":
             handle_search_medical_plan()

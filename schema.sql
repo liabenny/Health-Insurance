@@ -195,6 +195,7 @@ ALTER TABLE cohabit_type
 /* -------------------------Plan Attributes Data Set--------------------------- */
 CREATE TABLE plans
 (
+    issuer_id                         CHAR(5),
     plan_id                           CHAR(17),
     plan_variant_name                 VARCHAR(127),
     std_component_id                  CHAR(14),
@@ -222,6 +223,9 @@ CREATE TABLE plans
     plan_level_exclusions             TEXT,
     effective_date                    DATE,
     expiration_date                   DATE,
+    url_enrollment                    TEXT,
+    url_formulary                     TEXT,
+    url_plan_brochure                 TEXT,
     PRIMARY KEY (plan_id)
 );
 

@@ -91,6 +91,9 @@ def load_plans():
 def add_plan_general_info(raw):
     attr = dict()
 
+    if raw[const.CSV_PLAN_ISSUER_ID]:
+        attr[const.PLAN_ISSUER_ID] = raw[const.CSV_PLAN_ISSUER_ID]
+
     if raw[const.CSV_PLAN_ID]:
         attr[const.PLAN_ID] = raw[const.CSV_PLAN_ID]
 
@@ -195,6 +198,15 @@ def add_plan_general_info(raw):
 
     if raw[const.CSV_EXPIRATION_DATE]:
         attr[const.EXPIRATION_DATE] = raw[const.CSV_EXPIRATION_DATE]
+
+    if raw[const.CSV_URL_ENROLLMENT]:
+        attr[const.URL_ENROLLMENT] = raw[const.CSV_URL_ENROLLMENT]
+
+    if raw[const.CSV_URL_FORMULARY]:
+        attr[const.URL_FORMULARY] = raw[const.CSV_URL_FORMULARY]
+
+    if raw[const.CSV_URL_BROCHURE]:
+        attr[const.URL_BROCHURE] = raw[const.CSV_URL_BROCHURE]
 
     save_data(const.TABLE_PLAN, attr)
 

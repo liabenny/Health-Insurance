@@ -61,6 +61,7 @@ Const.TABLE_BUSINESS_RULE = "business_rules"
 Const.TABLE_BUSINESS_RULE_COHABIT = "business_rules_cohabitation"
 
 # Constants - TABLE ATTRIBUTES - Plans
+Const.PLAN_ISSUER_ID = "issuer_id"
 Const.PLAN_ID = "plan_id"
 Const.PLAN_VAR_NAME = "plan_variant_name"
 Const.STD_COMP_ID = "std_component_id"
@@ -93,6 +94,10 @@ Const.FIRST_TIER_UTIL = "first_tier_utilization"
 Const.SECOND_TIER_UTIL = "second_tier_utilization"
 Const.EFFECTIVE_DATE = "effective_date"
 Const.EXPIRATION_DATE = "expiration_date"
+Const.URL_ENROLLMENT = "url_enrollment"
+Const.URL_FORMULARY = "url_formulary"
+Const.URL_BROCHURE = "url_plan_brochure"
+
 
 # Constants - TABLE ATTRIBUTES - Medical Plans
 Const.M_METAL_LEVEL = "metal_level"
@@ -246,6 +251,7 @@ Const.COHABIT_TYPE = "cohabit_type"
 Const.COHABIT_REQUIRED = "cohabit_required"
 
 # Constants - DATA SET - Plans
+Const.CSV_PLAN_ISSUER_ID = "IssuerId"
 Const.CSV_PLAN_ID = "PlanId"
 Const.CSV_PLAN_VAR_NAME = "PlanVariantMarketingName"
 Const.CSV_PLAN_MARK_NAME = "PlanMarketingName"
@@ -290,6 +296,9 @@ Const.CSV_REFERRAL = "SpecialistRequiringReferral"
 Const.CSV_DENTAL_ONLY = "DentalOnlyPlan"
 Const.CSV_DED_INTEGRATED = "MedicalDrugDeductiblesIntegrated"
 Const.CSV_MOOP_INTEGRATED = "MedicalDrugMaximumOutofPocketIntegrated"
+Const.CSV_URL_ENROLLMENT = "URLForEnrollmentPayment"
+Const.CSV_URL_FORMULARY = "FormularyURL"
+Const.CSV_URL_BROCHURE = "PlanBrochure"
 
 Const.CSV_DED_BABY = "SBCHavingaBabyDeductible"
 Const.CSV_COPAY_BABY = "SBCHavingaBabyCopayment"

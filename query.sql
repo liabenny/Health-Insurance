@@ -61,7 +61,6 @@ ORDER BY state;
   OPTION2: Find State Average Individual Rate for specific age.(medical/dental)
   (can implement interactive date range)
   INPUT:
-        plan market coverage (required)
         dental/medical (required) - only for individual plan
         age (required)
         metal level (required)
@@ -73,7 +72,7 @@ ORDER BY state;
         average rate
  */
 -- Dental Plan
-SELECT state, effective_date, expiration_date, AVG(individual_rate)
+SELECT state, AVG(individual_rate)
 FROM rate_individual,
      (
          SELECT DISTINCT plans.std_component_id, state
@@ -82,15 +81,15 @@ FROM rate_individual,
          WHERE metal_level = 1
      ) r1
 WHERE r1.std_component_id = rate_individual.std_component_id
-  AND age_range_from = 15
-  AND age_range_to = 15
+  AND age_range_from <= 1
+  AND age_range_to >= 1
   AND effective_date = '2020-01-01'
   AND expiration_date = '2020-12-31'
 GROUP BY state, effective_date, expiration_date
 ORDER BY state;
 
 -- Medical Plan
-SELECT state, effective_date, expiration_date, AVG(individual_rate)
+SELECT state, AVG(individual_rate)
 FROM rate_individual,
      (
          SELECT DISTINCT plans.std_component_id, state

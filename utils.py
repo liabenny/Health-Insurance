@@ -1,4 +1,5 @@
 import re
+from tabulate import tabulate
 
 
 def get_num_int(value):
@@ -32,3 +33,14 @@ def get_age_pair(age_str):
         return 64, 100
     else:
         return age_str, age_str
+
+
+def print_series(series, header):
+    tmp = list()
+    for element in series:
+        tmp.append([element])
+    print(tabulate(tmp, headers=[header], tablefmt="fancy_grid"))
+
+
+def print_data_frame(data_frame, headers, showindex=False):
+    print(tabulate(data_frame, headers=headers, tablefmt="fancy_grid", showindex=showindex))

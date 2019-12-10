@@ -25,6 +25,10 @@ Const.HOST_NAME = "172.17.0.2"
 Const.DB_NAME = "insurance"
 Const.DB_USER = "manager"
 
+# Constants - REQUEST - Average Individual Rate
+Const.REQ_AGE = "age"
+Const.REQ_METAL_LEVEL = "metal level"
+
 # Constants - TABLE NAME - Enumeration
 Const.TABLE_MARK_COV_TYPE = "market_coverage_type"
 Const.TABLE_PLAN_TYPE = "plan_type"

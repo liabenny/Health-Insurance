@@ -42,5 +42,14 @@ def print_series(series, header, showindex=False):
     print(tabulate(tmp, headers=[header], tablefmt="fancy_grid", showindex=showindex))
 
 
-def print_data_frame(data_frame, headers, showindex=False):
-    print(tabulate(data_frame, headers=headers, tablefmt="fancy_grid", showindex=showindex))
+def print_data_frame(data_frame, headers, showindex=False, pageindex=None, pagesize=None):
+    # Do not need pagination
+    if pageindex is None or pagesize is None:
+        print(tabulate(data_frame, headers=headers, tablefmt="fancy_grid", showindex=showindex))
+        return
+
+    start_index = pageindex * pagesize
+    end_index = min(start_index + pagesize, len(data_frame))
+    print(tabulate(data_frame[start_index:end_index], headers=headers, tablefmt="fancy_grid", showindex=showindex))
+
+

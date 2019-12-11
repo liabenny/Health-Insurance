@@ -24,6 +24,27 @@ sys.modules[__name__] = Const()
 Const.HOST_NAME = "172.17.0.2"
 Const.DB_NAME = "insurance"
 Const.DB_USER = "manager"
+Const.MONGO_HOST = "172.17.0.3"
+Const.MONGO_PORT = "27017"
+
+# Constants - MONGO - Database
+Const.MONGO_DB_NAME = "insurance"
+
+# Constants - MONGO - Collection
+Const.COL_MEDICAL_DISEASE = "disease"
+
+# Constants - MONGO - Disease - Attributes
+Const.DISEASE = "disease"
+
+# Constants - CONDITION TYPE
+Const.EQUAL = "="
+Const.IN = "IN"
+Const.LESS_THEN = "<="
+Const.LARGER_THEN = ">="
+
+# Constants - REQUEST - Average Individual Rate
+Const.REQ_AGE = "age"
+Const.REQ_METAL_LEVEL = "metal level"
 
 # Constants - TABLE NAME - Enumeration
 Const.TABLE_MARK_COV_TYPE = "market_coverage_type"
@@ -299,6 +320,7 @@ Const.CSV_MOOP_INTEGRATED = "MedicalDrugMaximumOutofPocketIntegrated"
 Const.CSV_URL_ENROLLMENT = "URLForEnrollmentPayment"
 Const.CSV_URL_FORMULARY = "FormularyURL"
 Const.CSV_URL_BROCHURE = "PlanBrochure"
+Const.CSV_DISEASE_PROGRAM = "DiseaseManagementProgramsOffered"
 
 Const.CSV_DED_BABY = "SBCHavingaBabyDeductible"
 Const.CSV_COPAY_BABY = "SBCHavingaBabyCopayment"

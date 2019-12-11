@@ -1,175 +1,220 @@
 # database related code
-import tabulate as tabulate
-
-"""
-input
-["Insurance Type", "Subscriber", "Cover Range", "Metal Level", "Wellness Program",
-"Exchange", "Out of Country", "Payment Type", "Age", "State", "Family Type"]
-
-output
-["Plan Id", "State", "Plan Name", "family/individual_rate", "Plan Benefit", "coin/copay_inn_tier1", 
-"coin/copay_inn_tier1_type", "coin/copay_inn_tier2", "coin/copay_inn_tier2_type", "coin/copay_oon", 
-"coin/copay_oon_type", "benefit_limit_qty", "limit_unit"]
-"""
+import psycopg2
+import psycopg2.extras
+import pymongo
+import constants as const
+from psycopg2 import sql
 
 
 class Query:
-    """
-    @:arg: request
-    @:type: dictionary
-    """
+    conn = None
+    cursor = None
 
-    def __init__(self, request):
-        self.request = request
-        self._insurance_type = self.request["Insurance Type"]
-        self._subscriber = self.request["Subscriber"]
-        self._payment = self.request["Payment Type"]
-
-    def run_query(self):
-        self.build_str()
-        pass
-
-    def build_str(self):
-        return self.get_select() + self.get_from() + self.get_where()
-
-    # TODO
-    def get_select(self):
-        res = "SELECT plans.plan_id, plans.state, plans.plan_marketing_name, %s, plan_benefit.benefit_name, %s, %s" \
-              % (self.select_rate(), self.select_payment(), self.select_benefit_limit())
-        print(res)
-        return res
-
-    def select_rate(self):
-        if self._subscriber == "Individual":
-            return "rate_individual.individual_rate"
-        else:
-            return "rate_family.family_rate "
-
-    # TODO: Differentiate the type name for each tier
-    def select_payment(self):
-        if self._payment == "Copay":
-            return "plan_benefit.copay_inn_tier1, plan_benefit.copay_inn_tier2, plan_benefit.copay_oon"
-        else:
-            return "plan_benefit.coin_inn_tier1, plan_benefit.coin_inn_tier2, plan_benefit.coin_oon"
-
-    def select_benefit_limit(self):
-        return "plan_benefit_limitation.limit_qty, plan_benefit_limitation.limit_unit"
-
-    def get_from(self):
-        res = "FROM %s%s%s%s" % (
-            self.find_table_general(), self.find_table_insurance_type(),
-            self.find_table_subscriber(),
-            self.find_table_payment())
-        print(res)
-        return res
-
-    def get_where(self):
-        res = "WHERE plans.plan_id = %s AND " \
-              "plans.market_coverage = market_coverage_type.id AND market_coverage_type.type_name = %s AND " \
-              "plans.child_only_offering = child_only_offering_type.id AND child_only_offering_type.type_name = %s AND " \
-              "%s AND " \
-              "%s AND " \
-              "%s AND " \
-              "%s AND " \
-              "plan_benefit.plan_id = plan_benefit_limitation.plan_id AND " \
-              "plan_benefit.benefit_name = plan_benefit_limitation.benefit_name AND " \
-              "%s AND " \
-              "%s AND " \
-              "plans.state = '%s' AND " \
-              "%s" \
-              % (self.condition_insurance_type(), self.condition_subscriber(), self.condition_cover_range(),
-                 self.condition_metal_level(), self.condition_wellness(), self.condition_qhp(),
-                 self.condition_out_of_country(), self.condition_payment(), self.condition_age(),
-                 self.condition_state(),
-                 self.condition_family_type())
-        print(res)
-        return res
-
-    def condition_insurance_type(self):
-        if self._insurance_type == 'Medical':
-            return "medical_plans.plan_id"
-        else:
-            return "dental_plans.plan_id"
-
-    def condition_subscriber(self):
-        if self._subscriber == "Individual":
-            return "'Individual'"
-        else:
-            return "'SHOP (Small Group)'"
-
-    def condition_cover_range(self):
-        if self.request["Cover Range"] == "Adult and Child":
-            return "'Allows Adult and Child-Only'"
-        elif self.request["Cover Range"] == "Child Only":
-            return "'Allows Child-Only'"
-        else:
-            return "'Allows Adult-Only'"
-
-    def condition_metal_level(self):
-        if self._insurance_type == "Medical":
-            return "medical_plans.metal_level = medical_metal_level_type.id AND medical_metal_level_type.type_name = '%s'" \
-                   % self.request["Metal Level"]
-        else:
-            return "dental_plans.metal_level = dental_metal_level_type.id AND dental_metal_level_type.type_name = '%s'" \
-                   % self.request["Metal Level"]
-
-    def condition_wellness(self):
-        if self._insurance_type == "Medical":
-            if self.request["Wellness Program"] == "YES":
-                return "medical_plans.is_wellness_program_offered = TRUE"
+    @staticmethod
+    def __generate_conditions__(conditions):
+        results = list()
+        for key, value in conditions.items():
+            if value[0] == const.IN:
+                tmp = sql.SQL("{} IN ({})").format(sql.Identifier(key), value[1])
             else:
-                return "medical_plans.is_wellness_program_offered = FALSE"
-        return ""  # Dental plan no this attribute
+                tmp = sql.SQL(value[0]).join([sql.Identifier(key), sql.Placeholder()])
+            results.append(tmp)
+        return sql.Composed(results)
 
-    def condition_qhp(self):
-        return "plans.qhp_type = qhp_type.id AND qhp_type.type_name = '%s'" % self.request["Exchange"]
+    @classmethod
+    def __query__(cls, query, parameters=()):
+        cursor = cls.conn.cursor()
+        cursor.execute(query, parameters)
+        return cursor.fetchall()
 
-    def condition_out_of_country(self):
-        if self.request["Out of Country"] == "YES":
-            return "plans.out_of_country_coverage = TRUE"
+    @classmethod
+    def __query_one__(cls, query, parameters=()):
+        cursor = cls.conn.cursor()
+        cursor.execute(query, parameters)
+        return cursor.fetchone()
+
+    @classmethod
+    def init(cls, hostname, dbname, user):
+        cls.conn = psycopg2.connect("host=%s dbname=%s user=%s" % (hostname, dbname, user))
+        cls.cursor = cls.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    @classmethod
+    def get_time_intervals(cls, metal_level_id, age):
+        query = "SELECT effective_date, expiration_date FROM (" \
+                "SELECT DISTINCT effective_date, expiration_date " \
+                "FROM rate_individual, " \
+                "(" \
+                "SELECT DISTINCT plans.std_component_id, state " \
+                "FROM medical_plans " \
+                "JOIN plans ON medical_plans.plan_id = plans.plan_id " \
+                "WHERE metal_level = %s" \
+                ") r1 " \
+                "WHERE r1.std_component_id = rate_individual.std_component_id " \
+                "AND age_range_from <= %s " \
+                "AND age_range_to >= %s) r2 " \
+                "ORDER BY effective_date, expiration_date DESC"
+        return cls.__query__(query, (metal_level_id, age, age))
+
+    @classmethod
+    def get_avg_rate(cls, metal_level_id, age, effective_date, expiration_date, insurance_type):
+        # Table name of medical or dental plans
+        table_name = const.TABLE_MEDICAL_PLAN if insurance_type == "medical" \
+            else const.TABLE_DENTAL_PLAN
+
+        # SQL Query
+        query = "SELECT state, AVG(individual_rate) " \
+                "FROM rate_individual, " \
+                "(" \
+                "SELECT DISTINCT plans.std_component_id, state " \
+                "FROM " + table_name + " " \
+                                       "JOIN plans ON " + table_name + ".plan_id = plans.plan_id " \
+                                                                       "WHERE metal_level = %s" \
+                                                                       ") r1 " \
+                                                                       "WHERE r1.std_component_id = rate_individual.std_component_id " \
+                                                                       "AND age_range_from <= %s " \
+                                                                       "AND age_range_to >= %s " \
+                                                                       "AND effective_date = %s " \
+                                                                       "AND expiration_date = %s " \
+                                                                       "GROUP BY state, effective_date, expiration_date " \
+                                                                       "ORDER BY state"
+        return cls.__query__(query, (metal_level_id, age, age, effective_date, expiration_date))
+
+    @classmethod
+    def get_plans(cls, attributes, constrains, insurance_type, detail_constrains):
+        # Medical/Dental Plans
+        table_name = const.TABLE_MEDICAL_PLAN if insurance_type == "medical" \
+            else const.TABLE_DENTAL_PLAN
+
+        if detail_constrains:
+            # Having detailed constrains on medical/dental plans
+            subquery = sql.SQL("SELECT {} FROM {} WHERE {}").format(
+                sql.Identifier(const.PLAN_ID),
+                sql.Identifier(table_name),
+                sql.SQL(" AND ").join(cls.__generate_conditions__(detail_constrains))
+            )
         else:
-            return "plans.out_of_country_coverage = FALSE"
+            # No detailed constrains
+            subquery = sql.SQL("SELECT {} FROM {}").format(
+                sql.Identifier(const.PLAN_ID),
+                sql.Identifier(table_name)
+            )
 
-    # TODO: TO BE DETERMINED How to add more
-    def condition_payment(self):
-        if self._payment == 'Copay':
-            return "plan_benefit.coins_inn_tier1_type = coins_type.id AND " \
-                   "plan_benefit.coins_inn_tier2_type = coins_type.id AND plan.benefit.coins_oon_type = coins_type.id"
-        else:  # Coin
-            return "plan_benefit.copay_inn_tier1_type = copay_type.id AND " \
-                   "plan_benefit.copay_inn_tier2_type = copay_type.id AND plan_benefit.copay_oon_type = copay_type.id"
+        # Add extra constrain to plan id
+        constrains[const.PLAN_ID] = (const.IN, subquery)
 
-    def condition_age(self):
-        return "rate_individual.age = %s" % self.request["Age"]
+        # Generate SQL query
+        query = sql.SQL("SELECT {} FROM {} WHERE {}").format(
+            sql.SQL(',').join(sql.Identifier(attr) for attr in attributes),
+            sql.Identifier(const.TABLE_PLAN),
+            sql.SQL(" AND ").join(cls.__generate_conditions__(constrains))).as_string(cls.conn)
 
-    def condition_state(self):
-        return self.request["State"]
+        # Remove the extra constrain in plan id
+        constrains.pop(const.PLAN_ID)
 
-    def condition_family_type(self):
-        if self._subscriber == "Family":
-            return "rate_family.family_type = family_type.id AND family_type.type_name = '%s'" \
-                   % self.request["Family Type"]
-        return ""  # Individual no this attribute
+        return cls.__query__(query,
+                             list(value[1] for value in constrains.values()) +
+                             list(value[1] for value in detail_constrains.values()))
 
-    # The database tables can be apply for all query
-    def find_table_general(self):
-        return "plans, plan_benefit, plan_benefit_limitation, qhp_type"
+    @classmethod
+    def get_eye_insurance(cls, insurance_type, group_type, age, metal_level_id):
+        if insurance_type == "Eye Glasses" and group_type == "Adult":
+            insurance_type = "Eyeglasses"
+        key1 = "%" + insurance_type + "%"
+        key2 = "%" + group_type + "%"
+        # SQL Query
+        query = "SELECT r1.plan_id, rate_individual.effective_date, rate_individual.expiration_date, benefit_name, " \
+                "Avg(individual_rate), limit_qty, limit_unit " \
+                "FROM (SELECT plans.std_component_id, plans.plan_id FROM medical_plans " \
+                "JOIN plans ON medical_plans.plan_id = plans.plan_id WHERE metal_level = %s) r1, " \
+                "rate_individual, plan_benefit_limitation " \
+                "WHERE r1.plan_id = plan_benefit_limitation.plan_id " \
+                "AND rate_individual.std_component_id = r1.std_component_id " \
+                "AND rate_individual.age_range_from <= %s AND rate_individual.age_range_to >= %s " \
+                "AND plan_benefit_limitation.benefit_name LIKE ALL (ARRAY [%s, %s]) " \
+                "GROUP BY r1.plan_id, rate_individual.effective_date, rate_individual.expiration_date, benefit_name, " \
+                "limit_qty, limit_unit"
+        return cls.__query__(query, (metal_level_id, age, age, key1, key2))
 
-    def find_table_insurance_type(self):
-        if self._insurance_type == 'Medical':
-            return ', medical_plans, medical_metal_level_type'
-        else:  # Dental
-            return ', dental_plans, dental_metal_level_type'
+    @classmethod
+    def get_benefit_list(cls):
+        query = "SELECT DISTINCT benefit_name FROM plan_benefit ORDER BY benefit_name ASC"
+        return cls.__query__(query)
 
-    def find_table_subscriber(self):
-        if self._subscriber == 'Individual':
-            return ", rate_individual, age_type"
-        else:  # Family
-            return ", rate_family, family_type"
+    @classmethod
+    def get_benefit(cls, benefit_type):
+        query = "SELECT plan_benefit.plan_id, plan_benefit.benefit_name, plan_benefit_limitation.limit_qty, " \
+                "plan_benefit_limitation.limit_unit FROM plan_benefit, plan_benefit_limitation " \
+                "WHERE plan_benefit.benefit_name = %s AND plan_benefit.plan_id = plan_benefit_limitation.plan_id " \
+                "GROUP BY plan_benefit.plan_id, plan_benefit.benefit_name, plan_benefit_limitation.limit_qty, " \
+                "plan_benefit_limitation.limit_unit"
+        return cls.__query__(query, (benefit_type,))
 
-    # TODO: TO BE DETERMINED
-    def find_table_payment(self):
-        if self._payment == 'Copay':
-            return ", copay_type"
-        else:  # coin
-            return ", coin_type"
+    @classmethod
+    def get_plan_state(cls):
+        query = "SELECT DISTINCT state FROM plans ORDER BY state"
+        return cls.__query__(query)
+
+    @classmethod
+    def plain_query(cls, attributes, table_name, constrains, order_by=None):
+        if order_by:
+            query = sql.SQL("SELECT {} FROM {} WHERE {} ORDER BY {}").format(
+                sql.SQL(',').join(sql.Identifier(attr) for attr in attributes),
+                sql.Identifier(table_name),
+                sql.SQL(" AND ").join(cls.__generate_conditions__(constrains)),
+                sql.Identifier(order_by)
+            )
+
+        else:
+            query = sql.SQL("SELECT {} FROM {} WHERE {}").format(
+                sql.SQL(',').join(sql.Identifier(attr) for attr in attributes),
+                sql.Identifier(table_name),
+                sql.SQL(" AND ").join(cls.__generate_conditions__(constrains))
+            )
+
+        return cls.__query__(query, list(value[1] for value in constrains.values()))
+
+    @classmethod
+    def plain_query_one(cls, attributes, table_name, constrains):
+        query = sql.SQL("SELECT {} FROM {} WHERE {}").format(
+            sql.SQL(',').join(sql.Identifier(attr) for attr in attributes),
+            sql.Identifier(table_name),
+            sql.SQL(" AND ").join(cls.__generate_conditions__(constrains))
+        )
+
+        return cls.__query_one__(query, list(value[1] for value in constrains.values()))
+
+    @classmethod
+    def get_tobacco_insurance(cls, wellness, age):
+        query = "SELECT r1.plan_id, AVG(rate_individual.individual_rate), AVG(rate_individual.individual_tobacco_rate) " \
+                "FROM rate_individual, " \
+                "(SELECT plans.std_component_id, plans.plan_id FROM medical_plans " \
+                "JOIN plans ON medical_plans.plan_id = plans.plan_id " \
+                "WHERE medical_plans.is_wellness_program_offered = %s) r1 " \
+                "WHERE tobacco = True AND rate_individual.std_component_id = r1.std_component_id " \
+                "AND rate_individual.age_range_from <= %s AND rate_individual.age_range_to >= %s " \
+                "AND rate_individual.effective_date = '2020-01-01' AND rate_individual.expiration_date = '2020-12-31' " \
+                "GROUP BY r1.plan_id, rate_individual.age_range_from, rate_individual.age_range_to"
+        return cls.__query__(query, (wellness, age, age))
+
+
+class Mongo:
+    client = None
+    db = None
+
+    @classmethod
+    def init(cls, host, port, db_name):
+        cls.client = pymongo.MongoClient("mongodb://%s:%s/" % (host, port))
+        cls.db = cls.client[db_name]
+
+    @classmethod
+    def get_disease_programs(cls, col, plan_id):
+        col = cls.db[col]
+        res = col.find_one({"_id": plan_id})
+        if res:
+            return res[const.DISEASE]
+        else:
+            return None
+
+
+Query.init(const.HOST_NAME, const.DB_NAME, const.DB_USER)
+Mongo.init(const.MONGO_HOST, const.MONGO_PORT, const.MONGO_DB_NAME)

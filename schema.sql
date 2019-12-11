@@ -1,5 +1,9 @@
-CREATE USER manager WITH PASSWORD 'manager';
+DROP DATABASE IF EXISTS insurance;
 CREATE DATABASE insurance;
+
+DROP USER IF EXISTS manager;
+CREATE USER manager WITH PASSWORD 'manager';
+
 GRANT ALL PRIVILEGES ON DATABASE insurance TO manager;
 
 \connect insurance

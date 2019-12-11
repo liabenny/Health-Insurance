@@ -35,11 +35,11 @@ def get_age_pair(age_str):
         return age_str, age_str
 
 
-def print_series(series, header):
+def print_series(series, header, showindex=False):
     tmp = list()
     for element in series:
         tmp.append([element])
-    print(tabulate(tmp, headers=[header], tablefmt="fancy_grid"))
+    print(tabulate(tmp, headers=[header], tablefmt="fancy_grid", showindex=showindex))
 
 
 def print_data_frame(data_frame, headers, showindex=False):

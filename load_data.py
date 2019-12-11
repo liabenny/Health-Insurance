@@ -1,5 +1,6 @@
 import csv
 import psycopg2.extras
+import pymongo
 
 import utils
 import constants as const
@@ -27,6 +28,7 @@ def save_data(table, attributes):
 
 def load_plans():
     print("------LOAD Plan_Attributes_PUF.csv------")
+    collection = mongodb[const.COL_MEDICAL_DISEASE]
 
     with open(file_plan, mode='r', encoding='iso-8859-1') as fd:
         # Count total row number
@@ -80,6 +82,10 @@ def load_plans():
                     add_medical_plan_ded_int(raw_data)
                 else:
                     add_medical_plan_ded(raw_data)
+
+                if raw_data[const.CSV_DISEASE_PROGRAM]:
+                    add_medical_plan_disease(raw_data, collection)
+
 
             count += 1
             print('\rLoading Process:{:.2f}%'.format(count * 100 / rows), end='')
@@ -708,6 +714,15 @@ def add_medical_plan_ded_int(raw):
     save_data(const.TABLE_M_PLAN_DED_INT, attr)
 
 
+def add_medical_plan_disease(raw, collection):
+    record = dict()
+
+    record["_id"] = raw[const.CSV_PLAN_ID]
+    record["disease"] = raw[const.CSV_DISEASE_PROGRAM]
+
+    collection.insert_one(record)
+
+
 def load_benefits():
     print("------LOAD Benefits_Cost_Sharing_PUF.csv------")
 
@@ -1077,11 +1092,15 @@ def add_business_rules_cohabit(raw):
 
 
 if __name__ == '__main__':
-    # Connect to database
+    # Connect to postgres database
     conn = psycopg2.connect("host=%s dbname=%s user=%s" % (const.HOST_NAME,
                                                            const.DB_NAME,
                                                            const.DB_USER))
     cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    # Connect to mongoDB
+    mongo = pymongo.MongoClient("mongodb://%s:%s/" % (const.MONGO_HOST, const.MONGO_PORT))
+    mongodb = mongo[const.MONGO_DB_NAME]
 
     # Load Plan_Attributes_PUF.csv
     load_plans()

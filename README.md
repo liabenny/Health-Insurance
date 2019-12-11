@@ -31,6 +31,9 @@ $ docker run --name some-mongo -d mongo:tag
 - tabulate
 - csv
 - pymongo
+```python
+pip3 install <package-name>
+```
 
 #### File Structure
 1. schema.sql
@@ -77,6 +80,9 @@ At the main menu list, it allows users to access 5 categories,
 
 As for each category search results, this system provides general information of plan at first
 and enables users to choose a specific plan from results and display more detailed information.
+
+Through the query condition setup process, users can add and remove the conditions as wish and 
+the total number of results at each step will be also displayed at the menu list for user reference.
 
 ## Functions
 - [x] SQL and NON-SQL Database

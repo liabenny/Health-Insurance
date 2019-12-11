@@ -482,7 +482,7 @@ def handle_search_eye_plan():
 
     # 3. Decide Metal Level
     instruction = "\nWhich metal level are you looking for:"
-    utils.print_series(Enum.m_metal_type.keys(), "Metal Level")
+    utils.print_series(Enum.m_metal_type.keys(), "Metal Level", showindex=True)
     values = Enum.m_metal_type.keys()
 
     metal_level = wait_input(instruction, values)
@@ -495,25 +495,24 @@ def handle_search_eye_plan():
                                       metal_level_id=metal_level_id)
     utils.print_data_frame(results,
                            ["Plan ID", "Effective Date", "Expiration Date", "Benefit Name", "Estimated Average",
-                            "Quantity Limit", "Unit Limit"])
+                            "Quantity Limit", "Unit Limit"], showindex=True)
 
     input("\nPress any key to continue.")
 
 
 def handle_search_benefit():
-    print("\n==============Plan Benefit==============")
     # Print given benefits list
     benefit_list = Query.get_benefit_list()
     flatten = [item for sublist in benefit_list for item in sublist]
-    utils.print_series(flatten, "Benefit Item")
+    print("\n==============Plan Benefit==============")
+    utils.print_series(flatten, "Benefit Item", showindex=True)
     instruction = "\nWhich benefit of do you want to query?:"
     benefit_type = wait_input(instruction, flatten)
     if benefit_type == -1:
         return
-    print("!!!!", benefit_type)
     # Query for the result
     results = Query.get_benefit(benefit_type=benefit_type)
-    utils.print_data_frame(results, ["Plan ID", "Benefit", "Quantity Limit", "Unit Limit"])
+    utils.print_data_frame(results, ["Plan ID", "Benefit", "Quantity Limit", "Unit Limit"], showindex=True)
     input("\nPress any key to continue.")
 
 

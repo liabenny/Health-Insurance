@@ -474,7 +474,7 @@ def handle_search_eye_plan():
 
     # 3. Decides age
     instruction = "\nWhat is the age of searching? (1-99):"
-    values = list(str(i) for i in range(1, 99))
+    values = list(str(i) for i in range(1, 100))
     age = wait_input(instruction, values)
     if age == -1:
         return
@@ -536,25 +536,33 @@ def handle_tobacco_search():
     print("\n==============Tobacco User Friendly Insurance Plan==============")
     # age
     instruction = "\nWhat is the age of searching? (1-99):"
-    values = list(str(i) for i in range(1, 99))
+    values = list(str(i) for i in range(1, 100))
     age = wait_input(instruction, values)
     if age == -1:
         return
 
     # Wellness
-    instruction = "\nDo you need tobacco wellness program? (YES/NO):"
-    values = ["YES", "NO"]
+    instruction = "\nDo you need tobacco wellness program? (yes/no):"
+    values = ["yes", "no"]
     wellness = wait_input(instruction, values)
     if wellness == -1:
         return
-    wellness_indicator = "False"
-    if wellness == "YES":
-        wellness_indicator = "True"
+    wellness_indicator = False
+    if wellness == "yes":
+        wellness_indicator = True
 
+    # Print plans and select plan to get detail information
     results = Query.get_tobacco_insurance(wellness=wellness_indicator, age=age)
-    utils.print_data_frame(results, ["Plan ID", "No Tobacco User Rate", "Tobacco User Rate"])
-    # TODO: Extract plan id and search more detailed information
-    input("\nPress any key to continue.")
+    headers = ["Plan ID", "No Tobacco User Rate", "Tobacco User Rate"]
+    if results:
+        instruction = "You can select a plan for detail information: "
+        ind = display_in_pages(results, headers, instruction, showindex=True)
+        if ind >= 0:
+            plan_id = results[ind][0]
+            search_plan_detail_information(plan_id)
+    else:
+        print("\nNo plans found.")
+        input("\nPress any key to continue.")
 
 
 def display_in_pages(data, headers, instruction="", showindex=False):

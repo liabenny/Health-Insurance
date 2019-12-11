@@ -28,6 +28,12 @@ class Query:
         return cursor.fetchall()
 
     @classmethod
+    def __query_one__(cls, query, parameters=()):
+        cursor = cls.conn.cursor()
+        cursor.execute(query, parameters)
+        return cursor.fetchone()
+
+    @classmethod
     def init(cls, hostname, dbname, user):
         cls.conn = psycopg2.connect("host=%s dbname=%s user=%s" % (hostname, dbname, user))
         cls.cursor = cls.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -167,9 +173,18 @@ class Query:
 
         return cls.__query__(query, list(value[1] for value in constrains.values()))
 
+    @classmethod
+    def plain_query_one(cls, attributes, table_name, constrains):
+        query = sql.SQL("SELECT {} FROM {} WHERE {}").format(
+            sql.SQL(',').join(sql.Identifier(attr) for attr in attributes),
+            sql.Identifier(table_name),
+            sql.SQL(" AND ").join(cls.__generate_conditions__(constrains))
+        )
+
+        return cls.__query_one__(query, list(value[1] for value in constrains.values()))
+
 
 class Mongo:
-
     client = None
     db = None
 

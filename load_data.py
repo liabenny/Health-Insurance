@@ -8,8 +8,6 @@ from datetime import datetime
 from enumeration import Enum
 from psycopg2.extensions import AsIs
 
-# file_name = "C:\\RPI\\Database-Systems\\project\\datasets\\Benefits_Cost_Sharing_PUF.csv"
-# file_name = "C:\\Study\\Database-Systems\\project\\datasets\\Plan_Attributes_PUF.csv"
 file_plan = "2020-dataset/Plan_Attributes_PUF.csv"
 file_benefits = "2020-dataset/Benefits_Cost_Sharing_PUF.csv"
 file_rate = "2020-dataset/Rate_PUF.csv"
@@ -17,6 +15,12 @@ file_business_rules = "2020-dataset/Business_Rules_PUF.csv"
 
 
 def save_data(table, attributes):
+    """
+    Insert tuple into postgres
+    :param table: relation name
+    :param attributes: relation attributes and value
+    :return: N/A
+    """
     columns = attributes.keys()
     values = [attributes[column] for column in columns]
 
@@ -27,6 +31,10 @@ def save_data(table, attributes):
 
 
 def load_plans():
+    """
+    Load Plan_Attributes CSV file into database
+    :return:
+    """
     print("------LOAD Plan_Attributes_PUF.csv------")
     collection = mongodb[const.COL_MEDICAL_DISEASE]
 
@@ -85,7 +93,6 @@ def load_plans():
 
                 if raw_data[const.CSV_DISEASE_PROGRAM]:
                     add_medical_plan_disease(raw_data, collection)
-
 
             count += 1
             print('\rLoading Process:{:.2f}%'.format(count * 100 / rows), end='')
@@ -724,6 +731,10 @@ def add_medical_plan_disease(raw, collection):
 
 
 def load_benefits():
+    """
+    Load Benefits Cost Sharing CSV file into database
+    :return:
+    """
     print("------LOAD Benefits_Cost_Sharing_PUF.csv------")
 
     with open(file_benefits, mode='r', encoding='iso-8859-1') as fd:
@@ -883,6 +894,10 @@ def add_plan_benefits_limit(raw):
 
 
 def load_rate():
+    """
+    Load Rate CSV file into database
+    :return:
+    """
     print("------LOAD Rate_PUF.csv------")
 
     with open(file_rate, mode='r', encoding='iso-8859-1') as fd:
@@ -1005,6 +1020,10 @@ def add_rate_family(raw):
 
 
 def load_business_rules():
+    """
+    Load Business Rule CSV file into database
+    :return:
+    """
     print("------LOAD Business_Rules_PUF.csv------")
 
     with open(file_business_rules, mode='r', encoding='iso-8859-1') as fd:
@@ -1100,6 +1119,10 @@ if __name__ == '__main__':
 
     # Connect to mongoDB
     mongo = pymongo.MongoClient("mongodb://%s:%s/" % (const.MONGO_HOST, const.MONGO_PORT))
+    dblist = mongo.list_database_names()
+    if const.MONGO_DB_NAME in dblist:
+        # Drop database if exist
+        mongo.drop_database(const.MONGO_DB_NAME)
     mongodb = mongo[const.MONGO_DB_NAME]
 
     # Load Plan_Attributes_PUF.csv

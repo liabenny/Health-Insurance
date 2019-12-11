@@ -53,3 +53,5 @@ def print_data_frame(data_frame, headers, showindex=False, pageindex=None, pages
     print(tabulate(data_frame[start_index:end_index], headers=headers, tablefmt="fancy_grid", showindex=showindex))
 
 
+def print_single_data(data):
+    print(tabulate(data, tablefmt="fancy_grid"))

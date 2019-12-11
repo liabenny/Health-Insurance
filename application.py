@@ -52,7 +52,7 @@ def search_plan_sub_menu(constrains, insurance_type):
         options[0] = (1, "Show plans ({})".format(len(plans)))
 
         print("\n==========Insurance Plan - {} - {}=========="
-              .format(Enum.mark_cov_type_rev[constrains[const.MARK_COVERAGE][1]], insurance_type.upper()))
+              .format(insurance_type.upper(), Enum.mark_cov_type_rev[constrains[const.MARK_COVERAGE][1]]))
         utils.print_data_frame(options, ["Index", "Option"])
         index = input("\nPlease select an option:")
         if index.strip() == "1":
@@ -87,6 +87,8 @@ def search_plan_detail_information(plan_id):
     options = list()
     options.append((1, "Disease Programs"))
     options.append((2, "Plan Benefits"))
+    options.append((3, "Plan Detail"))
+    options.append((4, "Quit"))
     while True:
         print("\n==========Plan Information==========")
         utils.print_data_frame(options, ["Index", "Option"])
@@ -99,10 +101,12 @@ def search_plan_detail_information(plan_id):
         if index == '1':
             disease_str = Mongo.get_disease_programs(const.COL_MEDICAL_DISEASE, plan_id)
             if disease_str is None:
-                input("\nDisease Programs are not offered.")
+                print("\nDisease Programs are not offered for this plan.")
             else:
                 disease_list = disease_str.split(",")
                 utils.print_series(disease_list, "Disease Program")
+
+            input("\nPress any key to continue.")
 
         elif index == '2':
             attr_db = [const.PLAN_ID, const.BENEFIT_NAME]
@@ -110,9 +114,41 @@ def search_plan_detail_information(plan_id):
             constrains = dict()
             constrains[const.PLAN_ID] = (const.EQUAL, plan_id)
             info = Query.plain_query(attr_db, const.TABLE_BENEFIT, constrains, order_by=const.BENEFIT_NAME)
-            utils.print_data_frame(info, attr_output)
+            display_in_pages(info, attr_output)
 
-        elif index == 'quit':
+        elif index == '3':
+            attr_db = [const.PLAN_ID,
+                       const.PLAN_VAR_NAME,
+                       const.PLAN_STATE,
+                       const.PLAN_TYPE,
+                       const.QHP_TYPE,
+                       const.IS_NEW_PLAN,
+                       const.CHILD_ONLY,
+                       const.PREG_NOTICE,
+                       const.WELLNESS_OFFER,
+                       const.EFFECTIVE_DATE,
+                       const.EXPIRATION_DATE,
+                       const.URL_BROCHURE]
+            constrains = dict()
+            constrains[const.PLAN_ID] = (const.EQUAL, plan_id)
+            info = Query.plain_query_one(attr_db, const.TABLE_PLAN, constrains)
+            plan_info = list()
+            plan_info.append(("Plan ID", info[0]))
+            plan_info.append(("Plan Name", info[1]))
+            plan_info.append(("State", info[2]))
+            plan_info.append(("Plan Type", Enum.plan_type_rev[info[3]]))
+            plan_info.append(("QHP Type", Enum.qhp_type_rev[info[4]]))
+            plan_info.append(("Is New Plan", ("No", "Yes")[info[5]]))
+            plan_info.append(("Child Option", Enum.child_only_type_rev[info[6]]))
+            plan_info.append(("Pregnancy Notice", ("No", "Yes")[info[7]]))
+            plan_info.append(("Wellness Program Offered", ("No", "Yes")[info[8]]))
+            plan_info.append(("Effective Date", info[9]))
+            plan_info.append(("Expiration Date", info[10]))
+            plan_info.append(("URL", info[11]))
+            utils.print_single_data(plan_info)
+            input("\nPress any key to continue.")
+
+        elif index == '4' or index == 'quit':
             return
         else:
             print("Invalid Index.")
@@ -360,10 +396,6 @@ def search_plan_remove_filter(constrains, detail_constrains, insurance_type):
         detail_constrains.pop(const.PREG_NOTICE)
 
 
-def search_plan_dental(constrains):
-    pass
-
-
 def handle_find_avg_rate():
     print("\n==============Average Individual Rate==============")
 
@@ -481,7 +513,7 @@ def handle_search_benefit():
     input("\nPress any key to continue.")
 
 
-def display_in_pages(data, headers, instruction):
+def display_in_pages(data, headers, instruction=""):
     print("\n==========Select Plan==========")
     pageindex = 0
     pagesize = 10
@@ -499,18 +531,18 @@ def display_in_pages(data, headers, instruction):
 
         if (pageindex + 1) * pagesize < total_rows:
             # Continue to display
-            ins = "\nType 'it' for more plans, or type 'quit' to return.\n" + str(instruction)
+            ins = "\nType 'it' for more information, use 'quit' to return.\n" + str(instruction)
             values = list(str(i) for i in range(pagesize))
             values.append("it")
 
         else:
             # Reach end of list
-            ins = "\nReach end of the list, type 'quit' to return.\n" + str(instruction)
+            ins = "\nReach end of the list, use 'quit' to return.\n" + str(instruction)
             values = list(str(i) for i in range(pagesize))
 
         cmd = wait_input(ins, values)
         if cmd == -1:
-            return
+            return -1
         elif cmd == 'it':
             # Go to next page
             pageindex += 1
@@ -525,7 +557,6 @@ def wait_input(instruction, values):
     tmp = input(instruction)
     # If user input 'quit', then return to menu
     if tmp.lower() == 'quit':
-        print("Back to menu.")
         return -1
 
     # Keep waiting correct input
@@ -533,7 +564,6 @@ def wait_input(instruction, values):
         print("Invalid value, please try again.")
         tmp = input(instruction)
         if tmp.lower() == 'quit':
-            print("Back to menu.")
             return -1
     return tmp
 
@@ -547,7 +577,7 @@ def init(functions):
 
 def main():
     print("Welcome to Healthcare Insurance Database System!")
-    print("Data Source: The Centers for Medicare & Medicaid Services(CMS)\n")
+    print("Data Source: The Centers for Medicare & Medicaid Services(CMS)")
     while True:
         print("\n==============Menu==============")
         functions = list()

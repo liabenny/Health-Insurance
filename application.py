@@ -553,7 +553,7 @@ def handle_tobacco_search():
 
     # Print plans and select plan to get detail information
     results = Query.get_tobacco_insurance(wellness=wellness_indicator, age=age)
-    headers = ["Plan ID", "No Tobacco User Rate", "Tobacco User Rate"]
+    headers = ["Plan ID", "Non Tobacco User Average Rate", "Tobacco User Average Rate"]
     if results:
         instruction = "You can select a plan for detail information: "
         ind = display_in_pages(results, headers, instruction, showindex=True)

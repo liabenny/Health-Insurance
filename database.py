@@ -185,14 +185,15 @@ class Query:
 
     @classmethod
     def get_tobacco_insurance(cls, wellness, age):
-        query = "SELECT r1.plan_id, rate_individual.individual_rate, rate_individual.individual_tobacco_rate " \
+        query = "SELECT r1.plan_id, AVG(rate_individual.individual_rate), AVG(rate_individual.individual_tobacco_rate) " \
                 "FROM rate_individual, " \
                 "(SELECT plans.std_component_id, plans.plan_id FROM medical_plans " \
                 "JOIN plans ON medical_plans.plan_id = plans.plan_id " \
                 "WHERE medical_plans.is_wellness_program_offered = %s) r1 " \
                 "WHERE tobacco = True AND rate_individual.std_component_id = r1.std_component_id " \
                 "AND rate_individual.age_range_from <= %s AND rate_individual.age_range_to >= %s " \
-                "GROUP BY r1.plan_id, rate_individual.individual_rate, rate_individual.individual_tobacco_rate"
+                "AND rate_individual.effective_date = '2020-01-01' AND rate_individual.expiration_date = '2020-12-31' " \
+                "GROUP BY r1.plan_id, rate_individual.age_range_from, rate_individual.age_range_to"
         return cls.__query__(query, (wellness, age, age))
 
 

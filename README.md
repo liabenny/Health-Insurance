@@ -45,10 +45,10 @@ $ docker run --name some-mongo -d mongo:tag
 #### Data Loading
 #### SQL
 ```python
-$ python3 load_data.py
+python3 load_data.py
 ```
 *load_data.py* supports reading the .csv files and loading into the specific 
-database based on the database design of *schema.sql*.\
+database based on the database design of *schema.sql*.
 
 The enumeration data type generated from the allowable values of official 
 document file instructions, supported by *enumeration.py*.
@@ -57,12 +57,12 @@ document file instructions, supported by *enumeration.py*.
 
 ### Run
 ```python
-$ python3 application.py
+python3 application.py
 ```
 *application.py* supports the user interface by command line and pass the parameters
 to *database.py*. It provides multiple-level menu selection and dynamic 
 query functions, which delivers the real-time query result as the next step
-user options and enables user to add/remove query conditions arbitrarily.\
+user options and enables user to add/remove query conditions arbitrarily.
 
 *database.py* bridges the database and python execution. It generates the sql syntax 
 based on the use input arguments.
@@ -71,11 +71,11 @@ based on the use input arguments.
 
 
 ### Functions
--[x] SQL and NON-SQL Database
--[x] Dynamic and Real-Time Query
--[x] Automatic Data Loading and Supporting the Long-tern Reuse
--[x] Page Turning
--[x] Avoiding SQL-injection Vulnerabilities
+- [x] SQL and NON-SQL Database
+- [x] Dynamic and Real-Time Query
+- [x] Automatic Data Loading and Supporting the Long-tern Reuse
+- [x] Page Turning
+- [x] Avoiding SQL-injection Vulnerabilities
 
 ### Acknowledgment
 > Professor Samuel B. Johnson\

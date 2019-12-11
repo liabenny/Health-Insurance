@@ -11,13 +11,14 @@ def handle_search_plan():
     constrains = collections.OrderedDict()
 
     # 1. Decide plan objectives
-    utils.print_series(Enum.mark_cov_type.keys(), "Plan Coverage")
+    keys = list(Enum.mark_cov_type.keys())
+    utils.print_series(keys, "Plan Coverage", showindex=True)
     instruction = "\nWhich plan coverage are you looking for?: "
-    values = Enum.mark_cov_type.keys()
+    values = list(str(i) for i in range(len(keys)))
     plan_obj = wait_input(instruction, values)
     if plan_obj == -1:
         return
-    constrains[const.MARK_COVERAGE] = (const.EQUAL, Enum.mark_cov_type[plan_obj])
+    constrains[const.MARK_COVERAGE] = (const.EQUAL, Enum.mark_cov_type[keys[int(plan_obj)]])
 
     # 2. Decide plan type (medical/dental)
     instruction = "\nWhich type of insurance do you want to query? (medical/dental): "
@@ -33,20 +34,31 @@ def handle_search_plan():
 def search_plan_sub_menu(constrains, insurance_type):
     plans = list()
     options = list()
-    options.append((1, "Show plans"))
-    options.append((2, "Add filter"))
-    options.append((3, "Remove filter"))
+    options.append((1, "Select Plans"))
+    options.append((2, "Add Filter"))
+    options.append((3, "Remove Filter"))
     options.append((4, "Back to Menu"))
     attributes = [const.PLAN_ID, const.PLAN_VAR_NAME]
     detailed_constrains = collections.OrderedDict()
 
     while True:
+        # Query the plans from database
+        plans = Query.get_plans(attributes=attributes,
+                                constrains=constrains,
+                                detail_constrains=detailed_constrains,
+                                insurance_type=insurance_type)
+        # Update the record number
+        options[0] = (1, "Show plans ({})".format(len(plans)))
+
+        print("\n==========Insurance Plan - {} - {}=========="
+              .format(Enum.mark_cov_type_rev[constrains[const.MARK_COVERAGE][1]], insurance_type.upper()))
         utils.print_data_frame(options, ["Index", "Option"])
         index = input("\nPlease select an option:")
         if index.strip() == "1":
             # Handle "Show Plans"
-            utils.print_data_frame(plans, attributes)
-            input("\nPress any key to continue.")
+            plan_id = search_plan_select_plans(plans, attributes)
+            if plan_id:
+                search_plan_detail_information(plan_id)
 
         elif index.strip() == "2":
             # Handle "Add Filter"
@@ -55,25 +67,9 @@ def search_plan_sub_menu(constrains, insurance_type):
             else:
                 search_plan_add_filter_dental(constrains, detailed_constrains)
 
-            print(constrains)
-
-            plans = Query.get_plans(attributes=attributes,
-                                    constrains=constrains,
-                                    detail_constrains=detailed_constrains,
-                                    insurance_type=insurance_type)
-            # Update the record number
-            options[0] = (1, "Show plans ({})".format(len(plans)))
-
         elif index.strip() == "3":
             # Handle "Remove Filter"
             search_plan_remove_filter(constrains, detailed_constrains, insurance_type)
-
-            plans = Query.get_plans(attributes=attributes,
-                                    constrains=constrains,
-                                    detail_constrains=detailed_constrains,
-                                    insurance_type=insurance_type)
-            # Update the record number
-            options[0] = (1, "Show plans ({})".format(len(plans)))
 
         elif index.strip() == "4":
             # Handle "Quit"
@@ -84,20 +80,107 @@ def search_plan_sub_menu(constrains, insurance_type):
             print("Invalid Index.")
 
 
+def search_plan_select_plans(data, headers):
+    print("\n==========Select Plan==========")
+    pageindex = 0
+    pagesize = 10
+    total_rows = len(data)
+
+    # Print plans based on pages
+    while True:
+        # Print plan for current page
+        print()
+        utils.print_data_frame(data_frame=data,
+                               headers=headers,
+                               pageindex=pageindex,
+                               pagesize=pagesize,
+                               showindex=True)
+
+        if (pageindex + 1) * pagesize < total_rows:
+            # Continue to display
+            instruction = "\nType 'it' for more plans, or type 'quit' to return.\n" \
+                          "You can select a plan for detail information: "
+            values = list(str(i) for i in range(pagesize))
+            values.append("it")
+
+        else:
+            # Reach end of list
+            instruction = "\nReach end of the list, type 'quit' to return.\n" \
+                          "You can select a plan for detail information: "
+            values = list(str(i) for i in range(pagesize))
+
+        cmd = wait_input(instruction, values)
+        if cmd == -1:
+            return
+        elif cmd == 'it':
+            # Go to next page
+            pageindex += 1
+        else:
+            # Return the selected plan id
+            cur_index = int(cmd)
+            plan_index = pageindex * pagesize + cur_index
+            plan_id = data[plan_index][0]
+            print(plan_id)
+            return plan_id
+
+
+def search_plan_detail_information(plan_id):
+    options = list()
+    options.append((1, "Disease Programs"))
+    options.append((2, "Plan Benefits"))
+    while True:
+        print("\n==========Plan Information==========")
+        utils.print_data_frame(options, ["Index", "Option"])
+        instruction = "\nPlease select an option:"
+        values = list(str(i) for i in range(1, 1 + len(options)))
+        index = wait_input(instruction, values)
+        if index == -1:
+            return
+
+        if index == '1':
+            pass
+        elif index == '2':
+            attributes = [const.PLAN_ID, const.BENEFIT_NAME]
+            attr_output = ["Plan ID", "Benefit Name"]
+            constrains = dict()
+            constrains[const.PLAN_ID] = (const.EQUAL, plan_id)
+            info = Query.plain_query(attributes, const.TABLE_BENEFIT, constrains, order_by=const.BENEFIT_NAME)
+            utils.print_data_frame(info, attr_output)
+
+        elif index == 'quit':
+            return
+        else:
+            print("Invalid Index.")
+
+
 def search_plan_add_filter_medical(constrains, detail_constrains):
     filters = list()
-    filters.append((1, "Plan Type"))
-    filters.append((2, "QHP Type"))
-    filters.append((3, "Child Option"))
-    filters.append((4, "Metal level"))
-    filters.append((5, "Notice for pregnancy is required"))
-    filters.append((6, "Wellness Program Offered"))
-    filters.append((7, "Quit"))
+    filters.append((1, "State"))
+    filters.append((2, "Plan Type"))
+    filters.append((3, "QHP Type"))
+    filters.append((4, "Child Option"))
+    filters.append((5, "Metal level"))
+    filters.append((6, "Notice for pregnancy Required"))
+    filters.append((7, "Wellness Program Offered"))
+    filters.append((8, "Quit"))
 
     utils.print_data_frame(filters, ["Index", "Filter"])
-    index = input("\nPlease select an filter:")
-
+    instruction = "\nPlease select an filter:"
+    values = list(str(i) for i in range(1, 1 + len(filters)))
+    index = wait_input(instruction, values)
+    if index == -1:
+        return
     if index.strip() == "1":
+        state_list = Query.get_plan_state()
+        utils.print_data_frame(state_list, ["State"])
+        instruction = "\nPlease select a state: "
+        values = list(value[0] for value in state_list)
+        state = wait_input(instruction, values)
+        if state == -1:
+            return
+        constrains[const.PLAN_STATE] = (const.EQUAL, state)
+
+    elif index.strip() == "2":
         keys = list(Enum.plan_type.keys())
         utils.print_series(keys, "Plan Type", showindex=True)
         instruction = "\nWhich type of plan do you want?: "
@@ -107,7 +190,7 @@ def search_plan_add_filter_medical(constrains, detail_constrains):
             return
         constrains[const.PLAN_TYPE] = (const.EQUAL, Enum.plan_type[keys[int(index)]])
 
-    elif index.strip() == "2":
+    elif index.strip() == "3":
         keys = list(Enum.qhp_type.keys())
         utils.print_series(keys, "QHP Type", showindex=True)
         instruction = "\nWhich QHP type do you want?: "
@@ -117,7 +200,7 @@ def search_plan_add_filter_medical(constrains, detail_constrains):
             return
         constrains[const.QHP_TYPE] = (const.EQUAL, Enum.qhp_type[keys[int(index)]])
 
-    elif index.strip() == "3":
+    elif index.strip() == "4":
         keys = list(Enum.child_only_type.keys())
         utils.print_series(keys, "Child Option", showindex=True)
         instruction = "\nWhich child option do you want?: "
@@ -127,7 +210,7 @@ def search_plan_add_filter_medical(constrains, detail_constrains):
             return
         constrains[const.CHILD_ONLY] = (const.EQUAL, Enum.child_only_type[keys[int(index)]])
 
-    elif index.strip() == "4":
+    elif index.strip() == "5":
         keys = list(Enum.m_metal_type.keys())
         utils.print_series(keys, "Metal Level", showindex=True)
         instruction = "\nWhich metal level do you want?: "
@@ -137,7 +220,7 @@ def search_plan_add_filter_medical(constrains, detail_constrains):
             return
         detail_constrains[const.M_METAL_LEVEL] = (const.EQUAL, Enum.m_metal_type[keys[int(index)]])
 
-    elif index.strip() == "5":
+    elif index.strip() == "6":
         instruction = "\nWhether notice required for pregnancy?(yes/no): "
         values = ["yes", "no"]
         value = wait_input(instruction, values)
@@ -145,7 +228,7 @@ def search_plan_add_filter_medical(constrains, detail_constrains):
             return
         detail_constrains[const.PREG_NOTICE] = (const.EQUAL, True) if value == "yes" else (const.EQUAL, False)
 
-    elif index.strip() == "6":
+    elif index.strip() == "7":
         instruction = "\nDo you want wellness program included?(yes/no): "
         values = ["yes", "no"]
         value = wait_input(instruction, values)
@@ -153,7 +236,7 @@ def search_plan_add_filter_medical(constrains, detail_constrains):
             return
         detail_constrains[const.WELLNESS_OFFER] = (const.EQUAL, True) if value == "yes" else (const.EQUAL, False)
 
-    elif index.strip() == "7":
+    elif index.strip() == "8":
         print("Quit.")
         return
     else:
@@ -162,16 +245,31 @@ def search_plan_add_filter_medical(constrains, detail_constrains):
 
 def search_plan_add_filter_dental(constrains, detail_constrains):
     filters = list()
-    filters.append((1, "Plan Type"))
-    filters.append((2, "QHP Type"))
-    filters.append((3, "Child Option"))
-    filters.append((4, "Metal level"))
-    filters.append((5, "Quit"))
+    filters.append((1, "State"))
+    filters.append((2, "Plan Type"))
+    filters.append((3, "QHP Type"))
+    filters.append((4, "Child Option"))
+    filters.append((5, "Metal level"))
+    filters.append((6, "Quit"))
 
     utils.print_data_frame(filters, ["Index", "Filter"])
-    index = input("\nPlease select an filter:")
+    instruction = "\nPlease select an filter:"
+    values = list(str(i) for i in range(1, 1 + len(filters)))
+    index = wait_input(instruction, values)
+    if index == -1:
+        return
 
     if index.strip() == "1":
+        state_list = Query.get_plan_state()
+        utils.print_data_frame(state_list, ["State"])
+        instruction = "\nPlease select a state: "
+        values = list(value[0] for value in state_list)
+        state = wait_input(instruction, values)
+        if state == -1:
+            return
+        constrains[const.PLAN_STATE] = (const.EQUAL, state)
+
+    elif index.strip() == "2":
         keys = list(Enum.plan_type.keys())
         utils.print_series(keys, "Plan Type", showindex=True)
         instruction = "\nWhich type of plan do you want?: "
@@ -181,7 +279,7 @@ def search_plan_add_filter_dental(constrains, detail_constrains):
             return
         constrains[const.PLAN_TYPE] = (const.EQUAL, Enum.plan_type[keys[int(index)]])
 
-    elif index.strip() == "2":
+    elif index.strip() == "3":
         keys = list(Enum.qhp_type.keys())
         utils.print_series(keys, "QHP Type", showindex=True)
         instruction = "\nWhich QHP type do you want?: "
@@ -191,7 +289,7 @@ def search_plan_add_filter_dental(constrains, detail_constrains):
             return
         constrains[const.QHP_TYPE] = (const.EQUAL, Enum.qhp_type[keys[int(index)]])
 
-    elif index.strip() == "3":
+    elif index.strip() == "4":
         keys = list(Enum.child_only_type.keys())
         utils.print_series(keys, "Child Option", showindex=True)
         instruction = "\nWhich child option do you want?: "
@@ -201,7 +299,7 @@ def search_plan_add_filter_dental(constrains, detail_constrains):
             return
         constrains[const.CHILD_ONLY] = (const.EQUAL, Enum.child_only_type[keys[int(index)]])
 
-    elif index.strip() == "4":
+    elif index.strip() == "5":
         keys = list(Enum.d_metal_type.keys())
         utils.print_series(keys, "Metal Level", showindex=True)
         instruction = "\nWhich metal level do you want?: "
@@ -211,7 +309,7 @@ def search_plan_add_filter_dental(constrains, detail_constrains):
             return
         detail_constrains[const.M_METAL_LEVEL] = (const.EQUAL, Enum.d_metal_type[keys[int(index)]])
 
-    elif index.strip() == "5":
+    elif index.strip() == "6":
         print("Quit.")
         return
     else:
@@ -232,6 +330,10 @@ def search_plan_remove_filter(constrains, detail_constrains, insurance_type):
     if const.CHILD_ONLY in constrains:
         value = int(constrains[const.CHILD_ONLY][1])
         cur_filters.append(("Child Option", Enum.child_only_type_rev[value]))
+
+    if const.PLAN_STATE in constrains:
+        value = constrains[const.PLAN_STATE][1]
+        cur_filters.append(("State", value))
 
     if insurance_type == "medical":
         if const.M_METAL_LEVEL in detail_constrains:
@@ -276,6 +378,9 @@ def search_plan_remove_filter(constrains, detail_constrains, insurance_type):
 
     elif filter_name == "Child Option":
         constrains.pop(const.CHILD_ONLY)
+
+    elif filter_name == "State":
+        constrains.pop(const.PLAN_STATE)
 
     elif filter_name == "Metal Level":
         if insurance_type == "medical":
@@ -431,7 +536,7 @@ def wait_input(instruction, values):
 
 def init(functions):
     functions.append([1, "Search Insurance Plan"])
-    functions.append([2, "Find State Average Individual Rate for specific age"])
+    functions.append([2, "State Average Individual Rate"])
     functions.append([3, "Search Eye Plan"])
     functions.append([4, "Search Plan Benefits"])
 
@@ -440,7 +545,7 @@ def main():
     print("Welcome to Healthcare Insurance Database System!")
     print("Data Source: The Centers for Medicare & Medicaid Services(CMS)\n")
     while True:
-        print("\n==============Function Menu==============")
+        print("\n==============Menu==============")
         functions = list()
         init(functions)
         print(tabulate(functions, ["Option", "Description"], tablefmt="fancy_grid"))

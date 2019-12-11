@@ -129,3 +129,11 @@ WHERE market_coverage = 1
 );
 
 
+
+/**
+  OPTION4: Get plan information
+  INPUT:
+        plan id
+ */
+
+

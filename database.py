@@ -142,5 +142,29 @@ class Query:
                 "plan_benefit_limitation.limit_unit"
         return cls.__query__(query, (benefit_type,))
 
+    @classmethod
+    def get_plan_state(cls):
+        query = "SELECT DISTINCT state FROM plans ORDER BY state"
+        return cls.__query__(query)
+
+    @classmethod
+    def plain_query(cls, attributes, table_name, constrains, order_by=None):
+        if order_by:
+            query = sql.SQL("SELECT {} FROM {} WHERE {} ORDER BY {}").format(
+                sql.SQL(',').join(sql.Identifier(attr) for attr in attributes),
+                sql.Identifier(table_name),
+                sql.SQL(" AND ").join(cls.__generate_conditions__(constrains)),
+                sql.Identifier(order_by)
+            )
+
+        else:
+            query = sql.SQL("SELECT {} FROM {} WHERE {}").format(
+                sql.SQL(',').join(sql.Identifier(attr) for attr in attributes),
+                sql.Identifier(table_name),
+                sql.SQL(" AND ").join(cls.__generate_conditions__(constrains))
+            )
+
+        return cls.__query__(query, list(value[1] for value in constrains.values()))
+
 
 Query.init(const.HOST_NAME, const.DB_NAME, const.DB_USER)

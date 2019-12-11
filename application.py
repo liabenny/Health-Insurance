@@ -351,6 +351,67 @@ def handle_find_avg_rate():
     input("\nPress any key to continue.")
 
 
+def handle_search_eye_plan():
+    print("\n==============Eye Insurance Plan==============")
+
+    # 1. Decides eye insurance plan type
+    instruction = "\nWhich type of insurance do you want to query? (Eye Exam/ Eye Glasses):"
+    values = ["Eye Exam", "Eye Glasses"]
+    insurance_type = wait_input(instruction, values)
+    if insurance_type == -1:
+        return
+
+    # 2. Decides groups
+    instruction = "\nWhat is the group of searching? (Adult/ Child):"
+    values = ["Adult", "Child"]
+    group_type = wait_input(instruction, values)
+    if group_type == -1:
+        return
+
+    # 3. Decides age
+    instruction = "\nWhat is the age of searching? (1-99):"
+    values = list(str(i) for i in range(1, 99))
+    age = wait_input(instruction, values)
+    if age == -1:
+        return
+
+    # 3. Decide Metal Level
+    instruction = "\nWhich metal level are you looking for:"
+    utils.print_series(Enum.m_metal_type.keys(), "Metal Level")
+    values = Enum.m_metal_type.keys()
+
+    metal_level = wait_input(instruction, values)
+    if metal_level == -1:
+        return
+    metal_level_id = Enum.m_metal_type[metal_level]
+
+    # Query for the result
+    results = Query.get_eye_insurance(insurance_type=insurance_type, group_type=group_type, age=age,
+                                      metal_level_id=metal_level_id)
+    utils.print_data_frame(results,
+                           ["Plan ID", "Effective Date", "Expiration Date", "Benefit Name", "Estimated Average",
+                            "Quantity Limit", "Unit Limit"])
+
+    input("\nPress any key to continue.")
+
+
+def handle_search_benefit():
+    print("\n==============Plan Benefit==============")
+    # Print given benefits list
+    benefit_list = Query.get_benefit_list()
+    flatten = [item for sublist in benefit_list for item in sublist]
+    utils.print_series(flatten, "Benefit Item")
+    instruction = "\nWhich benefit of do you want to query?:"
+    benefit_type = wait_input(instruction, flatten)
+    if benefit_type == -1:
+        return
+    print("!!!!", benefit_type)
+    # Query for the result
+    results = Query.get_benefit(benefit_type=benefit_type)
+    utils.print_data_frame(results, ["Plan ID", "Benefit", "Quantity Limit", "Unit Limit"])
+    input("\nPress any key to continue.")
+
+
 def wait_input(instruction, values):
     tmp = input(instruction)
     # If user input 'quit', then return to menu
@@ -371,6 +432,8 @@ def wait_input(instruction, values):
 def init(functions):
     functions.append([1, "Search Insurance Plan"])
     functions.append([2, "Find State Average Individual Rate for specific age"])
+    functions.append([3, "Search Eye Plan"])
+    functions.append([4, "Search Plan Benefits"])
 
 
 def main():
@@ -386,6 +449,10 @@ def main():
             handle_search_plan()
         elif index.strip() == "2":
             handle_find_avg_rate()
+        elif index.strip() == "3":
+            handle_search_eye_plan()
+        elif index.strip() == "4":
+            handle_search_benefit()
         elif index == "quit":
             print("Bye.")
             exit(0)

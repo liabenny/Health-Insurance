@@ -3,7 +3,6 @@
 ## Authors
 Liangbin Zhu, Yujue Wang
 
-
 ## Dataset
 Data Source: [The Centers for Medicare & Medicaid Services (CMS) ](https://www.cms.gov/cciio/resources/data-resources/marketplace-puf) 
 >[Benefits and Cost Sharing Data](https://www.cms.gov/CCIIO/Resources/Data-Resources/Downloads/BenefitsCostSharing-DataDictionary-20.pdf)\
@@ -68,7 +67,16 @@ user options and enables user to add/remove query conditions arbitrarily.
 based on the use input arguments.
 
 ### Data Exploration
+This database system supports multiple types and multiple levels queries at the same time. 
+At the main menu list, it allows users to access 5 categories,
+1. General Insurance Plan Search
+2. State Average Individual Rate Search
+3. Eye Plan Search
+4. Plan Benefits Search
+5. Tobacco User Friendly Plan Search
 
+As for each category search results, this system provides general information of plan at first
+and enables users to choose a specific plan from results and display more detailed information.
 
 ## Functions
 - [x] SQL and NON-SQL Database

@@ -532,6 +532,31 @@ def handle_search_benefit():
         input("\nPress any key to continue.")
 
 
+def handle_tobacco_search():
+    print("\n==============Tobacco User Friendly Insurance Plan==============")
+    # age
+    instruction = "\nWhat is the age of searching? (1-99):"
+    values = list(str(i) for i in range(1, 99))
+    age = wait_input(instruction, values)
+    if age == -1:
+        return
+
+    # Wellness
+    instruction = "\nDo you need tobacco wellness program? (YES/NO):"
+    values = ["YES", "NO"]
+    wellness = wait_input(instruction, values)
+    if wellness == -1:
+        return
+    wellness_indicator = "False"
+    if wellness == "YES":
+        wellness_indicator = "True"
+
+    results = Query.get_tobacco_insurance(wellness=wellness_indicator, age=age)
+    utils.print_data_frame(results, ["Plan ID", "No Tobacco User Rate", "Tobacco User Rate"])
+    # TODO: Extract plan id and search more detailed information
+    input("\nPress any key to continue.")
+
+
 def display_in_pages(data, headers, instruction="", showindex=False):
     pageindex = 0
     pagesize = 10
@@ -594,6 +619,7 @@ def init(functions):
     functions.append([2, "State Average Individual Rate"])
     functions.append([3, "Search Eye Plan"])
     functions.append([4, "Search Plan Benefits"])
+    functions.append([5, "Search Tobacco User Friendly Plan"])
 
 
 def main():
@@ -613,6 +639,8 @@ def main():
             handle_search_eye_plan()
         elif index.strip() == "4":
             handle_search_benefit()
+        elif index.strip() == "5":
+            handle_tobacco_search()
         elif index == "quit":
             print("Bye.")
             exit(0)

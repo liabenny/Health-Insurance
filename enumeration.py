@@ -2,8 +2,16 @@ import psycopg2.extras
 import constants
 
 
-# Loading Enumeration Type Tables From Database
 class Enum:
+    """
+    Enumeration Class
+
+    This class would load enum table into memory.
+    It contains two formats for each table:
+    1. xxx_type: Value to ID Map
+    2. xxx_type_rev: ID to Value Map
+    """
+
     # Table - <market_coverage_type>
     mark_cov_type = dict()
     mark_cov_type_rev = dict()

@@ -8,6 +8,10 @@ from database import Mongo
 
 
 def handle_search_plan():
+    """
+    OPTION - Search Insurance Plan
+
+    """
     print("\n==============Insurance Plan==============")
     constrains = collections.OrderedDict()
 
@@ -33,6 +37,12 @@ def handle_search_plan():
 
 
 def search_plan_sub_menu(constrains, insurance_type):
+    """
+    Sub Menu - Search Plan Using Dynamic Filter(s).
+
+    :param constrains: filter constrains
+    :param insurance_type: medical/dental plan
+    """
     plans = list()
     options = list()
     options.append((1, "Select Plans"))
@@ -84,6 +94,11 @@ def search_plan_sub_menu(constrains, insurance_type):
 
 
 def search_plan_detail_information(plan_id):
+    """
+    Sub Menu - Looking for detail information of selected plan
+
+    :param plan_id: plan ID
+    """
     options = list()
     options.append((1, "Disease Programs"))
     options.append((2, "Plan Benefits"))
@@ -99,6 +114,7 @@ def search_plan_detail_information(plan_id):
             return
 
         if index == '1':
+            # Display disease programs the plan offered
             disease_str = Mongo.get_disease_programs(const.COL_MEDICAL_DISEASE, plan_id)
             if disease_str is None:
                 print("\nDisease Programs are not offered for this plan.")
@@ -109,6 +125,7 @@ def search_plan_detail_information(plan_id):
             input("\nPress any key to continue.")
 
         elif index == '2':
+            # Display benefits the plan covered
             attr_db = [const.BENEFIT_NAME]
             attr_output = ["Benefit Name"]
             constrains = dict()
@@ -117,6 +134,7 @@ def search_plan_detail_information(plan_id):
             display_in_pages(info, attr_output)
 
         elif index == '3':
+            # Display the general information of the plan
             attr_db = [const.PLAN_ID,
                        const.PLAN_VAR_NAME,
                        const.PLAN_STATE,
@@ -151,6 +169,12 @@ def search_plan_detail_information(plan_id):
 
 
 def search_plan_add_filter_medical(constrains, detail_constrains):
+    """
+    Add a filter for medical plan
+
+    :param constrains: current constains on <plans> table
+    :param detail_constrains: detail constrains on <medical_plans> table
+    """
     filters = list()
     filters.append((1, "State"))
     filters.append((2, "Plan Type"))
@@ -168,6 +192,7 @@ def search_plan_add_filter_medical(constrains, detail_constrains):
     if index == -1:
         return
     if index.strip() == "1":
+        # Decide constrains for state
         state_list = Query.get_plan_state()
         utils.print_data_frame(state_list, ["State"])
         instruction = "\nPlease select a state: "
@@ -178,6 +203,7 @@ def search_plan_add_filter_medical(constrains, detail_constrains):
         constrains[const.PLAN_STATE] = (const.EQUAL, state)
 
     elif index.strip() == "2":
+        # Decide constrains for plan type
         keys = list(Enum.plan_type.keys())
         utils.print_series(keys, "Plan Type", showindex=True)
         instruction = "\nWhich type of plan do you want?: "
@@ -188,6 +214,7 @@ def search_plan_add_filter_medical(constrains, detail_constrains):
         constrains[const.PLAN_TYPE] = (const.EQUAL, Enum.plan_type[keys[int(index)]])
 
     elif index.strip() == "3":
+        # Decide constrains for QHP type
         keys = list(Enum.qhp_type.keys())
         utils.print_series(keys, "QHP Type", showindex=True)
         instruction = "\nWhich QHP type do you want?: "
@@ -198,6 +225,7 @@ def search_plan_add_filter_medical(constrains, detail_constrains):
         constrains[const.QHP_TYPE] = (const.EQUAL, Enum.qhp_type[keys[int(index)]])
 
     elif index.strip() == "4":
+        # Decide constrains for child option
         keys = list(Enum.child_only_type.keys())
         utils.print_series(keys, "Child Option", showindex=True)
         instruction = "\nWhich child option do you want?: "
@@ -208,6 +236,7 @@ def search_plan_add_filter_medical(constrains, detail_constrains):
         constrains[const.CHILD_ONLY] = (const.EQUAL, Enum.child_only_type[keys[int(index)]])
 
     elif index.strip() == "5":
+        # Decide constrains for metal level
         keys = list(Enum.m_metal_type.keys())
         utils.print_series(keys, "Metal Level", showindex=True)
         instruction = "\nWhich metal level do you want?: "
@@ -218,6 +247,7 @@ def search_plan_add_filter_medical(constrains, detail_constrains):
         detail_constrains[const.M_METAL_LEVEL] = (const.EQUAL, Enum.m_metal_type[keys[int(index)]])
 
     elif index.strip() == "6":
+        # Decide constrains for pregnancy notice
         instruction = "\nWhether notice required for pregnancy?(yes/no): "
         values = ["yes", "no"]
         value = wait_input(instruction, values)
@@ -226,6 +256,7 @@ def search_plan_add_filter_medical(constrains, detail_constrains):
         detail_constrains[const.PREG_NOTICE] = (const.EQUAL, True) if value == "yes" else (const.EQUAL, False)
 
     elif index.strip() == "7":
+        # Decide constrains for wellness program of plan
         instruction = "\nDo you want wellness program included?(yes/no): "
         values = ["yes", "no"]
         value = wait_input(instruction, values)
@@ -241,6 +272,12 @@ def search_plan_add_filter_medical(constrains, detail_constrains):
 
 
 def search_plan_add_filter_dental(constrains, detail_constrains):
+    """
+    Add a filter for medical plan for dental plan
+
+    :param constrains: current constains on <plans> table
+    :param detail_constrains: detail constrains on <dental_plans> table
+    """
     filters = list()
     filters.append((1, "State"))
     filters.append((2, "Plan Type"))
@@ -257,6 +294,7 @@ def search_plan_add_filter_dental(constrains, detail_constrains):
         return
 
     if index.strip() == "1":
+        # Decide constrains for state
         state_list = Query.get_plan_state()
         utils.print_data_frame(state_list, ["State"])
         instruction = "\nPlease select a state: "
@@ -267,6 +305,7 @@ def search_plan_add_filter_dental(constrains, detail_constrains):
         constrains[const.PLAN_STATE] = (const.EQUAL, state)
 
     elif index.strip() == "2":
+        # Decide constrains for plan type
         keys = list(Enum.plan_type.keys())
         utils.print_series(keys, "Plan Type", showindex=True)
         instruction = "\nWhich type of plan do you want?: "
@@ -277,6 +316,7 @@ def search_plan_add_filter_dental(constrains, detail_constrains):
         constrains[const.PLAN_TYPE] = (const.EQUAL, Enum.plan_type[keys[int(index)]])
 
     elif index.strip() == "3":
+        # Decide constrains for QHP type
         keys = list(Enum.qhp_type.keys())
         utils.print_series(keys, "QHP Type", showindex=True)
         instruction = "\nWhich QHP type do you want?: "
@@ -287,6 +327,7 @@ def search_plan_add_filter_dental(constrains, detail_constrains):
         constrains[const.QHP_TYPE] = (const.EQUAL, Enum.qhp_type[keys[int(index)]])
 
     elif index.strip() == "4":
+        # Decide constrains for child option
         keys = list(Enum.child_only_type.keys())
         utils.print_series(keys, "Child Option", showindex=True)
         instruction = "\nWhich child option do you want?: "
@@ -297,6 +338,7 @@ def search_plan_add_filter_dental(constrains, detail_constrains):
         constrains[const.CHILD_ONLY] = (const.EQUAL, Enum.child_only_type[keys[int(index)]])
 
     elif index.strip() == "5":
+        # Decide constrains for metal level
         keys = list(Enum.d_metal_type.keys())
         utils.print_series(keys, "Metal Level", showindex=True)
         instruction = "\nWhich metal level do you want?: "
@@ -314,8 +356,16 @@ def search_plan_add_filter_dental(constrains, detail_constrains):
 
 
 def search_plan_remove_filter(constrains, detail_constrains, insurance_type):
-    # List current filter conditions
+    """
+    Remove the current filter(s) that is selected.
+
+    :param constrains: current constains on <plans> table
+    :param detail_constrains: detail constrains on <medical_plan>/<dental_plan> table
+    :param insurance_type: medical/dental insurance
+    """
     cur_filters = list()
+
+    # Check current filter(s)
     if const.PLAN_TYPE in constrains:
         value = int(constrains[const.PLAN_TYPE][1])
         cur_filters.append(("Plan Type", Enum.plan_type_rev[value]))
@@ -394,6 +444,12 @@ def search_plan_remove_filter(constrains, detail_constrains, insurance_type):
 
 
 def handle_find_avg_rate():
+    """
+    OPTION - Get Average Individual Rate for all available state.
+
+    This option need receive "age" and "metal level" information from user.
+    Then list the average individual rate for different state.
+    """
     print("\n==============Average Individual Rate==============")
 
     # 1. Decide insurance type
@@ -407,17 +463,18 @@ def handle_find_avg_rate():
     # 2. Decide Metal Level
     instruction = "\nWhich metal level are you looking for:"
     if insurance_type == "medical":
-        utils.print_series(Enum.m_metal_type.keys(), "Metal Level")
-        values = Enum.m_metal_type.keys()
+        keys = list(Enum.m_metal_type.keys())
+        utils.print_series(keys, "Metal Level", showindex=True)
     else:
-        utils.print_series(Enum.d_metal_type.keys(), "Metal Level")
-        values = Enum.d_metal_type.keys()
+        keys = list(Enum.d_metal_type.keys())
+        utils.print_series(keys, "Metal Level", showindex=True)
 
-    metal_level = wait_input(instruction, values)
-    if metal_level == -1:
+    values = list(str(i) for i in range(len(keys)))
+    value = wait_input(instruction, values)
+    if value == -1:
         return
-    metal_level_id = Enum.m_metal_type[metal_level] if insurance_type == "medical" \
-        else Enum.d_metal_type[metal_level]
+    metal_level_id = Enum.m_metal_type[keys[int(value)]] if insurance_type == "medical" \
+        else Enum.d_metal_type[keys[int(value)]]
 
     # 3. Decide age for query
     instruction = "\nWhat is the age of searching? (1-99):"
@@ -451,6 +508,12 @@ def handle_find_avg_rate():
 
 
 def handle_search_eye_plan():
+    """
+    OPTION - Search Plan that covers Eye related benefits
+
+    This option need "Age" information from user.
+    And the option is able to provide plan information based on "Group", "Metal Level" and "Eye Benefits"
+    """
     print("\n==============Eye Insurance Plan==============")
 
     # 1. Decides eye insurance plan type
@@ -508,6 +571,13 @@ def handle_search_eye_plan():
 
 
 def handle_search_benefit():
+    """
+    OPTION - Search Plans based on benefits
+
+    This option would provide user all the available benefits.
+    Then user is able to search all plans that cover this selected benefit.
+    """
+
     # Search benefits list from database
     benefit_list = Query.get_benefit_list()
 
@@ -534,6 +604,12 @@ def handle_search_benefit():
 
 
 def handle_tobacco_search():
+    """
+    OPTION - Search Plans based on tobacco preference
+
+    This option need "Age" information from user.
+    Then it is able to find all plans based on user's tobacco preference
+    """
     print("\n==============Tobacco User Friendly Insurance Plan==============")
     # age
     instruction = "\nWhat is the age of searching? (1-99):"
@@ -567,6 +643,16 @@ def handle_tobacco_search():
 
 
 def display_in_pages(data, headers, instruction="", showindex=False):
+    """
+    Display data using pages
+
+    :param data: data to be displayed
+    :param headers: headers of the list
+    :param instruction: instructions for the list
+    :param showindex: whether to display index
+    :return: select row index in data
+             or -1 if not selected
+    """
     pageindex = 0
     pagesize = 10
     total_rows = len(data)
@@ -609,6 +695,13 @@ def display_in_pages(data, headers, instruction="", showindex=False):
 
 
 def wait_input(instruction, values):
+    """
+    Waiting for user input
+
+    :param instruction: instruction for user's input
+    :param values: available input list
+    :return: user input
+    """
     tmp = input(instruction)
     # If user input 'quit', then return to menu
     if tmp.lower() == 'quit':

@@ -103,11 +103,29 @@ WHERE r1.std_component_id = rate_individual.std_component_id
   AND effective_date = '2020-01-01'
   AND expiration_date = '2020-12-31'
 GROUP BY state, effective_date, expiration_date
-ORDER BY state
+ORDER BY state;
 
 
 /**
-  OPTION3: Find Family Plan
+  OPTION3: Individual Plan
+  INPUT:
+        medical/dental (required)
+
  */
+SELECT *
+FROM plans
+WHERE market_coverage = 2
+  AND plan_id IN (
+    SELECT medical_plans.plan_id
+    FROM medical_plans
+);
+
+SELECT *
+FROM plans
+WHERE market_coverage = 1
+  AND plan_id IN (
+    SELECT dental_plans.plan_id
+    FROM dental_plans
+);
 
 

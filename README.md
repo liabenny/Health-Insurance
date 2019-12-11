@@ -1,18 +1,17 @@
-# Health-Insurance-Database-System
+# Health Insurance Database System
 
-### Authors
+## Authors
 Liangbin Zhu, Yujue Wang
 
-### Project Description
 
-### Dataset
+## Dataset
 Data Source: [The Centers for Medicare & Medicaid Services (CMS) ](https://www.cms.gov/cciio/resources/data-resources/marketplace-puf) 
 >[Benefits and Cost Sharing Data](https://www.cms.gov/CCIIO/Resources/Data-Resources/Downloads/BenefitsCostSharing-DataDictionary-20.pdf)\
 >[Rate Data](https://www.cms.gov/CCIIO/Resources/Data-Resources/Downloads/Rate-DataDictionary-PY20.pdf)\
 >[Plan Attributes Data](https://www.cms.gov/CCIIO/Resources/Data-Resources/Downloads/PlanAttributes-DataDictionary-PY20.pdf)\
 >[Business Rules Data](https://www.cms.gov/CCIIO/Resources/Data-Resources/Downloads/BusinessRules-DataDictionary-PY20.pdf)
 
-### Setup Guide
+## Setup Guide
 #### Deployment Environment
 - Operating System: Linux (centos 7.7.1908)
 - Platform: Microsoft Azure
@@ -32,6 +31,7 @@ $ docker run --name some-mongo -d mongo:tag
 - psycopg2
 - tabulate
 - csv
+- pymongo
 
 #### File Structure
 1. schema.sql
@@ -55,7 +55,7 @@ document file instructions, supported by *enumeration.py*.
 
 #### NON-SQL
 
-### Run
+## Run
 ```python
 python3 application.py
 ```
@@ -70,7 +70,7 @@ based on the use input arguments.
 ### Data Exploration
 
 
-### Functions
+## Functions
 - [x] SQL and NON-SQL Database
 - [x] Dynamic and Real-Time Query
 - [x] Automatic Data Loading and Supporting the Long-tern Reuse

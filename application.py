@@ -55,9 +55,11 @@ def search_plan_sub_menu(constrains, insurance_type):
         utils.print_data_frame(options, ["Index", "Option"])
         index = input("\nPlease select an option:")
         if index.strip() == "1":
-            # Handle "Show Plans"
-            plan_id = search_plan_select_plans(plans, attributes)
-            if plan_id:
+            # Handle "Select Plans"
+            instruction = "You can select a plan for detail information: "
+            ind = display_in_pages(plans, attributes, instruction)
+            if ind >= 0:
+                plan_id = plans[ind][0]
                 search_plan_detail_information(plan_id)
 
         elif index.strip() == "2":
@@ -80,50 +82,6 @@ def search_plan_sub_menu(constrains, insurance_type):
             print("Invalid Index.")
 
 
-def search_plan_select_plans(data, headers):
-    print("\n==========Select Plan==========")
-    pageindex = 0
-    pagesize = 10
-    total_rows = len(data)
-
-    # Print plans based on pages
-    while True:
-        # Print plan for current page
-        print()
-        utils.print_data_frame(data_frame=data,
-                               headers=headers,
-                               pageindex=pageindex,
-                               pagesize=pagesize,
-                               showindex=True)
-
-        if (pageindex + 1) * pagesize < total_rows:
-            # Continue to display
-            instruction = "\nType 'it' for more plans, or type 'quit' to return.\n" \
-                          "You can select a plan for detail information: "
-            values = list(str(i) for i in range(pagesize))
-            values.append("it")
-
-        else:
-            # Reach end of list
-            instruction = "\nReach end of the list, type 'quit' to return.\n" \
-                          "You can select a plan for detail information: "
-            values = list(str(i) for i in range(pagesize))
-
-        cmd = wait_input(instruction, values)
-        if cmd == -1:
-            return
-        elif cmd == 'it':
-            # Go to next page
-            pageindex += 1
-        else:
-            # Return the selected plan id
-            cur_index = int(cmd)
-            plan_index = pageindex * pagesize + cur_index
-            plan_id = data[plan_index][0]
-            print(plan_id)
-            return plan_id
-
-
 def search_plan_detail_information(plan_id):
     options = list()
     options.append((1, "Disease Programs"))
@@ -140,11 +98,11 @@ def search_plan_detail_information(plan_id):
         if index == '1':
             pass
         elif index == '2':
-            attributes = [const.PLAN_ID, const.BENEFIT_NAME]
+            attr_db = [const.PLAN_ID, const.BENEFIT_NAME]
             attr_output = ["Plan ID", "Benefit Name"]
             constrains = dict()
             constrains[const.PLAN_ID] = (const.EQUAL, plan_id)
-            info = Query.plain_query(attributes, const.TABLE_BENEFIT, constrains, order_by=const.BENEFIT_NAME)
+            info = Query.plain_query(attr_db, const.TABLE_BENEFIT, constrains, order_by=const.BENEFIT_NAME)
             utils.print_data_frame(info, attr_output)
 
         elif index == 'quit':
@@ -514,6 +472,46 @@ def handle_search_benefit():
     results = Query.get_benefit(benefit_type=benefit_type)
     utils.print_data_frame(results, ["Plan ID", "Benefit", "Quantity Limit", "Unit Limit"], showindex=True)
     input("\nPress any key to continue.")
+
+
+def display_in_pages(data, headers, instruction):
+    print("\n==========Select Plan==========")
+    pageindex = 0
+    pagesize = 10
+    total_rows = len(data)
+
+    # Print plans based on pages
+    while True:
+        # Print plan for current page
+        print()
+        utils.print_data_frame(data_frame=data,
+                               headers=headers,
+                               pageindex=pageindex,
+                               pagesize=pagesize,
+                               showindex=True)
+
+        if (pageindex + 1) * pagesize < total_rows:
+            # Continue to display
+            ins = "\nType 'it' for more plans, or type 'quit' to return.\n" + str(instruction)
+            values = list(str(i) for i in range(pagesize))
+            values.append("it")
+
+        else:
+            # Reach end of list
+            ins = "\nReach end of the list, type 'quit' to return.\n" + str(instruction)
+            values = list(str(i) for i in range(pagesize))
+
+        cmd = wait_input(ins, values)
+        if cmd == -1:
+            return
+        elif cmd == 'it':
+            # Go to next page
+            pageindex += 1
+        else:
+            # Return the selected item index in data
+            cur_index = int(cmd)
+            index = pageindex * pagesize + cur_index
+            return index
 
 
 def wait_input(instruction, values):

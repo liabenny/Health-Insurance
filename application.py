@@ -354,6 +354,7 @@ def search_plan_remove_filter(constrains, detail_constrains, insurance_type):
     # If do not have any filter, then return
     if not cur_filters:
         print("\nNo filter.")
+        input("\nPress any key to continue.")
         return
     cur_filters.append(("Quit", "-"))
     utils.print_data_frame(cur_filters, ["Filter", "Constrain"], showindex=True)

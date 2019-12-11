@@ -58,7 +58,7 @@ def search_plan_sub_menu(constrains, insurance_type):
         if index.strip() == "1":
             # Handle "Select Plans"
             instruction = "You can select a plan for detail information: "
-            ind = display_in_pages(plans, attributes, instruction)
+            ind = display_in_pages(plans, attributes, instruction, showindex=True)
             if ind >= 0:
                 plan_id = plans[ind][0]
                 search_plan_detail_information(plan_id)
@@ -109,8 +109,8 @@ def search_plan_detail_information(plan_id):
             input("\nPress any key to continue.")
 
         elif index == '2':
-            attr_db = [const.PLAN_ID, const.BENEFIT_NAME]
-            attr_output = ["Plan ID", "Benefit Name"]
+            attr_db = [const.BENEFIT_NAME]
+            attr_output = ["Benefit Name"]
             constrains = dict()
             constrains[const.PLAN_ID] = (const.EQUAL, plan_id)
             info = Query.plain_query(attr_db, const.TABLE_BENEFIT, constrains, order_by=const.BENEFIT_NAME)
@@ -124,8 +124,6 @@ def search_plan_detail_information(plan_id):
                        const.QHP_TYPE,
                        const.IS_NEW_PLAN,
                        const.CHILD_ONLY,
-                       const.PREG_NOTICE,
-                       const.WELLNESS_OFFER,
                        const.EFFECTIVE_DATE,
                        const.EXPIRATION_DATE,
                        const.URL_BROCHURE]
@@ -140,11 +138,9 @@ def search_plan_detail_information(plan_id):
             plan_info.append(("QHP Type", Enum.qhp_type_rev[info[4]]))
             plan_info.append(("Is New Plan", ("No", "Yes")[info[5]]))
             plan_info.append(("Child Option", Enum.child_only_type_rev[info[6]]))
-            plan_info.append(("Pregnancy Notice", ("No", "Yes")[info[7]]))
-            plan_info.append(("Wellness Program Offered", ("No", "Yes")[info[8]]))
-            plan_info.append(("Effective Date", info[9]))
-            plan_info.append(("Expiration Date", info[10]))
-            plan_info.append(("URL", info[11]))
+            plan_info.append(("Effective Date", info[7]))
+            plan_info.append(("Expiration Date", info[8]))
+            plan_info.append(("URL", info[9]))
             utils.print_single_data(plan_info)
             input("\nPress any key to continue.")
 
@@ -457,18 +453,24 @@ def handle_search_eye_plan():
     print("\n==============Eye Insurance Plan==============")
 
     # 1. Decides eye insurance plan type
-    instruction = "\nWhich type of insurance do you want to query? (Eye Exam/ Eye Glasses):"
-    values = ["Eye Exam", "Eye Glasses"]
-    insurance_type = wait_input(instruction, values)
-    if insurance_type == -1:
+    instruction = "\nWhich type of insurance do you want to query? :"
+    options = ["Eye Exam", "Eye Glasses"]
+    utils.print_series(options, "Option", showindex=True)
+    values = list(str(i) for i in range(len(options)))
+    value = wait_input(instruction, values)
+    if value == -1:
         return
+    insurance_type = options[int(value)]
 
     # 2. Decides groups
     instruction = "\nWhat is the group of searching? (Adult/ Child):"
-    values = ["Adult", "Child"]
-    group_type = wait_input(instruction, values)
-    if group_type == -1:
+    options = ["Adult", "Child"]
+    utils.print_series(options, "Option", showindex=True)
+    values = list(str(i) for i in range(len(options)))
+    value = wait_input(instruction, values)
+    if value == -1:
         return
+    group_type = options[int(value)]
 
     # 3. Decides age
     instruction = "\nWhat is the age of searching? (1-99):"
@@ -479,42 +481,58 @@ def handle_search_eye_plan():
 
     # 3. Decide Metal Level
     instruction = "\nWhich metal level are you looking for:"
-    utils.print_series(Enum.m_metal_type.keys(), "Metal Level", showindex=True)
-    values = Enum.m_metal_type.keys()
+    keys = list(Enum.m_metal_type.keys())
+    utils.print_series(keys, "Metal Level", showindex=True)
+    values = list(str(i) for i in range(len(keys)))
 
-    metal_level = wait_input(instruction, values)
-    if metal_level == -1:
+    value = wait_input(instruction, values)
+    if value == -1:
         return
-    metal_level_id = Enum.m_metal_type[metal_level]
+    metal_level_id = Enum.m_metal_type[keys[int(value)]]
 
     # Query for the result
     results = Query.get_eye_insurance(insurance_type=insurance_type, group_type=group_type, age=age,
                                       metal_level_id=metal_level_id)
-    utils.print_data_frame(results,
-                           ["Plan ID", "Effective Date", "Expiration Date", "Benefit Name", "Estimated Average",
-                            "Quantity Limit", "Unit Limit"], showindex=True)
-
-    input("\nPress any key to continue.")
+    headers = ["Plan ID", "Effective Date", "Expiration Date", "Benefit Name", "Estimated Average",
+               "Quantity Limit", "Unit Limit"]
+    if results:
+        instruction = "You can select a plan for detail information: "
+        ind = display_in_pages(results, headers, instruction, showindex=True)
+        if ind >= 0:
+            plan_id = results[ind][0]
+            search_plan_detail_information(plan_id)
+    else:
+        print("\nNo plans found.")
+        input("\nPress any key to continue.")
 
 
 def handle_search_benefit():
-    # Print given benefits list
+    # Search benefits list from database
     benefit_list = Query.get_benefit_list()
-    flatten = [item for sublist in benefit_list for item in sublist]
+
+    # Select a benefit
     print("\n==============Plan Benefit==============")
-    utils.print_series(flatten, "Benefit Item", showindex=True)
-    instruction = "\nWhich benefit of do you want to query?:"
-    benefit_type = wait_input(instruction, flatten)
-    if benefit_type == -1:
+    instruction = "Which benefit of do you want to query?:"
+    ind = display_in_pages(benefit_list, ["Benefit"], instruction, showindex=True)
+    if ind == -1:
         return
+    benefit_type = benefit_list[int(ind)][0]
+
     # Query for the result
     results = Query.get_benefit(benefit_type=benefit_type)
-    utils.print_data_frame(results, ["Plan ID", "Benefit", "Quantity Limit", "Unit Limit"], showindex=True)
-    input("\nPress any key to continue.")
+    headers = ["Plan ID", "Benefit", "Quantity Limit", "Unit Limit"]
+    if results:
+        instruction = "You can select a plan for detail information: "
+        ind = display_in_pages(results, headers, instruction, showindex=True)
+        if ind >= 0:
+            plan_id = results[ind][0]
+            search_plan_detail_information(plan_id)
+    else:
+        print("\nNo plans found.")
+        input("\nPress any key to continue.")
 
 
-def display_in_pages(data, headers, instruction=""):
-    print("\n==========Select Plan==========")
+def display_in_pages(data, headers, instruction="", showindex=False):
     pageindex = 0
     pagesize = 10
     total_rows = len(data)
@@ -527,18 +545,21 @@ def display_in_pages(data, headers, instruction=""):
                                headers=headers,
                                pageindex=pageindex,
                                pagesize=pagesize,
-                               showindex=True)
+                               showindex=showindex)
+
+        # If open index, then allow user to select an index
+        if showindex:
+            values = list(str(i) for i in range(pagesize))
+        else:
+            values = list()
 
         if (pageindex + 1) * pagesize < total_rows:
             # Continue to display
             ins = "\nType 'it' for more information, use 'quit' to return.\n" + str(instruction)
-            values = list(str(i) for i in range(pagesize))
             values.append("it")
-
         else:
             # Reach end of list
             ins = "\nReach end of the list, use 'quit' to return.\n" + str(instruction)
-            values = list(str(i) for i in range(pagesize))
 
         cmd = wait_input(ins, values)
         if cmd == -1:

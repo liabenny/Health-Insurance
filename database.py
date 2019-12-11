@@ -129,11 +129,11 @@ class Query:
                 "rate_individual, plan_benefit_limitation " \
                 "WHERE r1.plan_id = plan_benefit_limitation.plan_id " \
                 "AND rate_individual.std_component_id = r1.std_component_id " \
-                "AND rate_individual.age_range_from = %s " \
+                "AND rate_individual.age_range_from <= %s AND rate_individual.age_range_to >= %s " \
                 "AND plan_benefit_limitation.benefit_name LIKE ALL (ARRAY [%s, %s]) " \
                 "GROUP BY r1.plan_id, rate_individual.effective_date, rate_individual.expiration_date, benefit_name, " \
                 "limit_qty, limit_unit"
-        return cls.__query__(query, (metal_level_id, age, key1, key2))
+        return cls.__query__(query, (metal_level_id, age, age, key1, key2))
 
     @classmethod
     def get_benefit_list(cls):
@@ -182,6 +182,18 @@ class Query:
         )
 
         return cls.__query_one__(query, list(value[1] for value in constrains.values()))
+
+    @classmethod
+    def get_tobacco_insurance(cls, wellness, age):
+        query = "SELECT r1.plan_id, rate_individual.individual_rate, rate_individual.individual_tobacco_rate " \
+                "FROM rate_individual, " \
+                "(SELECT plans.std_component_id, plans.plan_id FROM medical_plans " \
+                "JOIN plans ON medical_plans.plan_id = plans.plan_id " \
+                "WHERE medical_plans.is_wellness_program_offered = %s) r1 " \
+                "WHERE tobacco = True AND rate_individual.std_component_id = r1.std_component_id " \
+                "AND rate_individual.age_range_from <= %s AND rate_individual.age_range_to >= %s " \
+                "GROUP BY r1.plan_id, rate_individual.individual_rate, rate_individual.individual_tobacco_rate"
+        return cls.__query__(query, (wellness, age, age))
 
 
 class Mongo:

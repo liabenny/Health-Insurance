@@ -1,6 +1,7 @@
 # database related code
 import psycopg2
 import psycopg2.extras
+import pymongo
 import constants as const
 from psycopg2 import sql
 
@@ -167,4 +168,25 @@ class Query:
         return cls.__query__(query, list(value[1] for value in constrains.values()))
 
 
+class Mongo:
+
+    client = None
+    db = None
+
+    @classmethod
+    def init(cls, host, port, db_name):
+        cls.client = pymongo.MongoClient("mongodb://%s:%s/" % (host, port))
+        cls.db = cls.client[db_name]
+
+    @classmethod
+    def get_disease_programs(cls, col, plan_id):
+        col = cls.db[col]
+        res = col.find_one({"_id": plan_id})
+        if res:
+            return res[const.DISEASE]
+        else:
+            return None
+
+
 Query.init(const.HOST_NAME, const.DB_NAME, const.DB_USER)
+Mongo.init(const.MONGO_HOST, const.MONGO_PORT, const.MONGO_DB_NAME)

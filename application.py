@@ -4,6 +4,7 @@ import collections
 from enumeration import Enum
 from tabulate import tabulate
 from database import Query
+from database import Mongo
 
 
 def handle_search_plan():
@@ -96,7 +97,13 @@ def search_plan_detail_information(plan_id):
             return
 
         if index == '1':
-            pass
+            disease_str = Mongo.get_disease_programs(const.COL_MEDICAL_DISEASE, plan_id)
+            if disease_str is None:
+                input("\nDisease Programs are not offered.")
+            else:
+                disease_list = disease_str.split(",")
+                utils.print_series(disease_list, "Disease Program")
+
         elif index == '2':
             attr_db = [const.PLAN_ID, const.BENEFIT_NAME]
             attr_output = ["Plan ID", "Benefit Name"]

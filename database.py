@@ -67,16 +67,16 @@ class Query:
                 "(" \
                 "SELECT DISTINCT plans.std_component_id, state " \
                 "FROM " + table_name + " " \
-                                       "JOIN plans ON " + table_name + ".plan_id = plans.plan_id " \
-                                                                       "WHERE metal_level = %s" \
-                                                                       ") r1 " \
-                                                                       "WHERE r1.std_component_id = rate_individual.std_component_id " \
-                                                                       "AND age_range_from <= %s " \
-                                                                       "AND age_range_to >= %s " \
-                                                                       "AND effective_date = %s " \
-                                                                       "AND expiration_date = %s " \
-                                                                       "GROUP BY state, effective_date, expiration_date " \
-                                                                       "ORDER BY state"
+                "JOIN plans ON " + table_name + ".plan_id = plans.plan_id " \
+                "WHERE metal_level = %s" \
+                ") r1 " \
+                "WHERE r1.std_component_id = rate_individual.std_component_id " \
+                "AND age_range_from <= %s " \
+                "AND age_range_to >= %s " \
+                "AND effective_date = %s " \
+                "AND expiration_date = %s " \
+                "GROUP BY state, effective_date, expiration_date " \
+                "ORDER BY state"
         return cls.__query__(query, (metal_level_id, age, age, effective_date, expiration_date))
 
     @classmethod

@@ -89,7 +89,7 @@ user options and enables user to add/remove query conditions arbitrarily.
 *database.py* bridges the database and python execution. It generates the sql syntax 
 based on the use input arguments.
 
-### VI. Data Exploration
+## VI. Data Exploration
 This database system supports multiple types and multiple levels queries at the same time. 
 At the main menu list, it allows users to access 5 categories,
 1. General Insurance Plan Search
@@ -111,7 +111,7 @@ the total number of results at each step will be also displayed at the menu list
 - [x] Page Turning
 - [x] Avoiding SQL-injection Vulnerabilities
 
-### VIII. Acknowledgment
+## VIII. Acknowledgment
 > Professor Samuel B. Johnson\
 > Coffee :)
 

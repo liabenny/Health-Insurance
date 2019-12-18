@@ -27,11 +27,11 @@ $ docker run --name some-mongo -d mongo:tag
 ```python
 $ constants.py
 
-Const.HOST_NAME = "172.17.0.2" # Container IP address
-Const.DB_NAME = "insurance" # Database Name
-Const.DB_USER = "manager" # Database Role Name
-Const.MONGO_HOST = "172.17.0.3" # Container IP address
-Const.MONGO_PORT = "27017" # Port Number
+Const.HOST_NAME = "172.17.0.2" # PostgreSQL Server Host Address
+Const.DB_NAME = "insurance" # PostgreSQL Database Name
+Const.DB_USER = "manager" # PostgreSQL Database Role Name
+Const.MONGO_HOST = "172.17.0.3" # MongoDB Server Host Address
+Const.MONGO_PORT = "27017" # MongoDB Server Port
 ```
 #### Programming Language
 - Python (3.x)
